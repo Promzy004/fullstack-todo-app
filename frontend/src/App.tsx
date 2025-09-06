@@ -2,6 +2,9 @@ import { Route, Routes } from "react-router-dom"
 import Register from "./pages/Register"
 import { useEffect, useState } from "react"
 import Login from "./pages/Login"
+import Dashboard from "./layout/Dashboard"
+import TodoSection from "./pages/TodoSection"
+import Settings from "./pages/settings"
 
 function App() {
 
@@ -39,7 +42,10 @@ function App() {
     <div>
       <button onClick={() => setDarkMode(!darkMode)}>toggle</button>
       <Routes>
-        <Route path="/" element='' />
+        <Route path="/" element={<Dashboard />}>
+          <Route index element={<TodoSection />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
       </Routes>

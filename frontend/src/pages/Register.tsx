@@ -1,18 +1,5 @@
 const Register = () => {
     return (
-        // <div className="mx-auto mt-20 px-4 py-3 w-max flex flex-col gap-7 justify-center items-center bg-light dark:bg-dark">
-        //     <h2>Sign Up</h2>
-        //     <form action="" method="post">
-        //         <label className="flex flex-col gap-1">
-        //             <span>Name</span>
-        //             <input 
-        //                 type="text"
-        //                 aria-label="Input your name" 
-        //                 className="border bg-white dark:bg-gray-400 focus:outline-none"
-        //             />
-        //         </label>
-        //     </form>
-        // </div>
         <div className="flex items-center justify-center min-h-screen px-4">
             <div className="w-full max-w-md p-6 space-y-6 rounded-lg shadow-lg sm:p-8 bg-light dark:bg-dark">
                 {/* Title */}
