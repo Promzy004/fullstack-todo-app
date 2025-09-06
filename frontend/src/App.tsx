@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import Register from "./pages/Register"
 import { useEffect, useState } from "react"
+import Login from "./pages/Login"
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
       <Routes>
         <Route path="/" element='' />
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </div>
   )
