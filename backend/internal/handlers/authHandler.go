@@ -2,37 +2,28 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"todo-app/config"
 	"todo-app/internal/models"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/golang-jwt/jwt/v5"
+	"todo-app/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Claims stored in the token
-type Claims struct {
-	UserID int `json:"user_id"`
-	jwt.RegisteredClaims
-}
-
+// register user handler
 func Register(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var input models.UserRegister
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid Input"})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Input"})
 		return
 	}
 
 	// checks to validate user inputs
-	errors := validateInput(input)
+	errors := utils.ValidateInput(input)
 	if (len(errors) > 0) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(errors)
@@ -49,7 +40,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]string{"error": "User already exist"})
+		json.NewEncoder(w).Encode(map[string]string{"message": "User already exist"})
 		return
 	}
 
@@ -58,63 +49,22 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func validateInput(input any) map[string]string {
-	var validate = validator.New()
-	errorMessages := make(map[string]string)
-
-	if err := validate.Struct(input); err != nil {
-		errors := err.(validator.ValidationErrors)
-
-		for _, e := range errors {
-			field := strings.ToLower(e.Field())
-			tag := strings.ToLower(e.Tag())
-			if value, ok := models.ValidationMessages[field]; ok {
-				if msg, exist := value[tag]; exist {
-				errorMessages[field] = msg
-				}
-			}
-		}
-	}
-	
-	return errorMessages
-
-}
-
-
-
-// type contextKey string
-
-// const ContextUserID contextKey = "userID"
-
-// GenerateToken creates a signed JWT for a user ID
-func GenerateToken(userID int, ttl time.Duration) (string, error) {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		return "", fmt.Errorf("JWT_SECRET not set")
-	}
-
-	exp := time.Now().Add(ttl)
-	claims := &Claims{
-		UserID: userID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(exp),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "todo-app",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(secret))
-}
-
-
+// login user handler
 func Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var input models.User
+	var input models.UserLogin
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid Input"})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Input"})
+		return
+	}
+
+	errors := utils.ValidateInput(input)
+
+	if len(errors) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errors)
 		return
 	}
 
@@ -127,20 +77,22 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-		http.Error(w, "Invalid password", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "password is incorrect"})
 		return
 	}
 
-	// ✅ Generate JWT (24h expiry)
-	tokenString, err := GenerateToken(user.ID, 24*time.Hour)
+	// calls the GenerateToken function to generate the token
+	tokenString, err := utils.GenerateToken(user.ID, 24*time.Hour)
 	if err != nil {
-		http.Error(w, "Could not generate token", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Could not generate Token"})
 		return
 	}
 
-	// ✅ Set cookie with JWT
+	// set token to cookie with http only
     http.SetCookie(w, &http.Cookie{
-        Name:     "token",
+        Name:     "todo-token",
         Value:    tokenString,
         Expires:  time.Now().Add(24 * time.Hour),
         HttpOnly: true,  // prevent JS access (XSS protection)
@@ -148,10 +100,26 @@ func Login(w http.ResponseWriter, r *http.Request) {
         SameSite: http.SameSiteStrictMode, // blocks cross-site use
     })
 
-	// ✅ Return token as JSON
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Login successful",
-	})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Login successful",})
 }
 
+
+// logout user handler
+func Logout (w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	http.SetCookie(w, &http.Cookie{
+		Name: "todo-token",
+		Value: "",
+		Expires: time.Now().Add(-time.Hour),
+		HttpOnly: true,
+		Path: "/",
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Successfully logged out",})
+}
 
