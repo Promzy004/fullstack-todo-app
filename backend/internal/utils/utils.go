@@ -47,7 +47,7 @@ func GenerateCode() string {
 }
 
 // GenerateToken creates a signed JWT for a user ID
-func GenerateToken(userID int, ttl time.Duration) (string, error) {
+func GenerateToken(userID int, userFirstname string, userLastname string, userEmail string, ttl time.Duration) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		return "", fmt.Errorf("JWT_SECRET not set")
@@ -56,6 +56,9 @@ func GenerateToken(userID int, ttl time.Duration) (string, error) {
 	exp := time.Now().Add(ttl)
 	claims := &models.Claims{
 		UserID: userID,
+		UserFirstname: userFirstname,
+		UserLastname: userLastname,
+		UserEmail: userEmail,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(exp),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

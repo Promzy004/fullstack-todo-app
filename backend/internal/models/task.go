@@ -11,6 +11,9 @@ type Task struct {
 
 // Claims stored in the token
 type Claims struct {
-	UserID int `json:"user_id"`
+	UserID int 				`json:"user_id"`
+	UserFirstname string 	`json:"firstname"`
+	UserLastname string 	`json:"lastname"`
+	UserEmail string 		`json:"email"`
 	jwt.RegisteredClaims
 }

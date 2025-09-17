@@ -84,7 +84,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	err := config.DB.QueryRow("SELECT id, password FROM users WHERE email = ?", input.Email).Scan(&user.ID, &user.Password)
+	err := config.DB.QueryRow("SELECT id, firstname, lastname, email, password FROM users WHERE email = ?", input.Email).Scan(&user.ID, &user.Firstname, &user.Lastname, &user.Email, &user.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"message": "User not found"})
@@ -98,7 +98,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// calls the GenerateToken function to generate the token
-	tokenString, err := utils.GenerateToken(user.ID, 24*time.Hour)
+	tokenString, err := utils.GenerateToken(user.ID, user.Firstname, user.Lastname, user.Email, 24*time.Hour)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Could not generate Token"})
