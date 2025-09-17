@@ -76,13 +76,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]map[string]string {
 			"errors": errors,
 		})
+		return
 	}
 
 	var user models.User
-	err := config.DB.QueryRow("SELECT id, password FROM users WHERE email = ?", input.Email).
-		Scan(&user.ID, &user.Password)
+	err := config.DB.QueryRow("SELECT id, password FROM users WHERE email = ?", input.Email).Scan(&user.ID, &user.Password)
 	if err != nil {
-		http.Error(w, "User not found", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "User not found"})
 		return
 	}
 
@@ -128,8 +129,50 @@ func Logout (w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteStrictMode,
 	})
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Successfully logged out",})
+}
+
+
+// resend code handler
+func ResendCode(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var input models.ResetCode
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Input"})
+		return
+	}
+
+	errors := utils.ValidateInput(input)
+	if len(errors) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]map[string]string {
+			"errors": errors,
+		})
+		return
+	}
+
+	var id int 
+	err := config.DB.QueryRow("SELECT id FROM users WHERE email = ?", input.Email).Scan(&id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "User not found"})
+		return
+	}
+
+	code := utils.GenerateCode()
+	_, updateError := config.DB.Exec("UPDATE users SET code = ? where email = ?", code, input.Email)
+	if updateError != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Error updating user"})
+		return
+	}
+
+	mail.SendCode(input.Email, code)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "verification sent"})
 }
 

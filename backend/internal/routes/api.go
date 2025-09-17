@@ -7,6 +7,7 @@ import (
 )
 
 func APIRoutes(r chi.Router) {
+	r.Post("/api/auth/resend-code", handlers.ResendCode)
 	r.Post("/api/auth/register", handlers.Register)
 	r.Post("/api/create-task", handlers.CreateTask)
 	r.Post("/api/update/{id}", handlers.UpdateTask)

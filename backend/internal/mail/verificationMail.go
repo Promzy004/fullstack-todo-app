@@ -51,10 +51,6 @@ func SendCode(to string, otp string) error {
 	m.SetHeader("Subject", "Verification OTP")
 	m.SetBody("text/html", htmlBody)
 
-	// Add attachments (uncomment to use)
-    // m.Attach("./document.pdf")
-    // m.Attach("./http_status_codes_guide.pdf")
-
     d := gomail.NewDialer(host, mail_port, from_email, password)
     // Send the email
     if err := d.DialAndSend(m); err != nil {

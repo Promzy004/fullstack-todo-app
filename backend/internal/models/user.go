@@ -9,15 +9,19 @@ type User struct {
 }
 
 type UserRegister struct {
-	Firstname string	`validate:"required,min=3"`
-	Lastname string 	`validate:"required,min=3"`
-	Email    string 	`validate:"required,email"`
-	Password string		`validate:"required"`
+	Firstname string	`json:"firstname" validate:"required,min=3"`
+	Lastname string 	`json:"lastname" validate:"required,min=3"`
+	Email    string 	`json:"email" validate:"required,email"`
+	Password string		`json:"password" validate:"required"`
 }
 
 type UserLogin struct {
-	Email    string 	`validate:"required,email"`
-	Password string		`validate:"required"`
+	Email    string 	`json:"email" validate:"required,email"`
+	Password string		`json:"password" validate:"required"`
+}
+
+type ResetCode struct {
+	Email string `json:"email" validate:"required,email"`
 }
 
 var ValidationMessages = map[string]map[string]string{
