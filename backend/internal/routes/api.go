@@ -1,12 +1,16 @@
 package routes
 
 import (
+	"todo-app/internal/handlers"
+
 	"github.com/go-chi/chi/v5"
-	"net/http"
 )
 
 func APIRoutes(r chi.Router) {
-	r.Get("/", func (w http.ResponseWriter, request *http.Request) {
-		w.Write([]byte("index page"))
-	})
+	r.Post("/api/auth/register", handlers.Register)
+	r.Post("/api/create-task", handlers.CreateTask)
+	r.Post("/api/update/{id}", handlers.UpdateTask)
+	r.Post("/api/delete/{id}", handlers.DeleteTask)
+	r.Post("/api/auth/login", handlers.Login)
+	r.Get("/api/tasks", handlers.GetTasks)
 }
