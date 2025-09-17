@@ -8,8 +8,9 @@ import (
 
 	"todo-app/config"
 
-	"github.com/go-chi/chi/v5"
 	"todo-app/internal/middlewares"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {

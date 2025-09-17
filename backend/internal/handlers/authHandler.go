@@ -6,15 +6,18 @@ import (
 	"time"
 
 	"todo-app/config"
+	"todo-app/internal/mail"
 	"todo-app/internal/models"
 
 	"todo-app/internal/utils"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
 // register user handler
 func Register(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	var input models.UserRegister
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -26,23 +29,29 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	errors := utils.ValidateInput(input)
 	if (len(errors) > 0) {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors)
+		json.NewEncoder(w).Encode(map[string]map[string]string {
+			"errors": errors,
+		})
 		return
 	}
 
 	// hash user password inputted
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(input.Password), 12)
+	code := utils.GenerateCode()
 
 	// query db, to insert the information
 	_, err := config.DB.Exec(
-		"INSERT INTO users (firstname, lastname, email, password) VALUES (?, ?, ?, ?)",
-		input.Firstname, input.Lastname, input.Email, string(hashedPassword),
+		"INSERT INTO users (firstname, lastname, email, password, code) VALUES (?, ?, ?, ?, ?)",
+		input.Firstname, input.Lastname, input.Email, string(hashedPassword), code,
 	)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"message": "User already exist"})
 		return
 	}
+
+	//send code to user email
+	mail.SendCode(input.Email, code)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Registration successful"})
@@ -64,8 +73,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	if len(errors) > 0 {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors)
-		return
+		json.NewEncoder(w).Encode(map[string]map[string]string {
+			"errors": errors,
+		})
 	}
 
 	var user models.User

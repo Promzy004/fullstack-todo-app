@@ -2,8 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 	"todo-app/internal/models"
@@ -33,6 +35,15 @@ func ValidateInput(input any) map[string]string {
 	
 	return errorMessages
 
+}
+
+
+// generate random code, 6 length and return as string
+func GenerateCode() string {
+	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	randCode := random.Intn((999999 - 100000) + 1 ) + 100000
+
+    return strconv.FormatInt(int64(randCode), 10)
 }
 
 // GenerateToken creates a signed JWT for a user ID
