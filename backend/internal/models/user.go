@@ -5,6 +5,7 @@ type User struct {
 	Firstname string `json:"firstname"`
 	Lastname string `json:"lastname"`
 	Email    string `json:"email"`
+	Code    string `json:"code"`
 	Password string `json:"-"` 
 }
 
@@ -24,6 +25,11 @@ type ResetCode struct {
 	Email string `json:"email" validate:"required,email"`
 }
 
+type Verify struct {
+	Email string `json:"email" validate:"required,email"`
+	Code string `json:"code" validate:"required"`
+}
+
 var ValidationMessages = map[string]map[string]string{
 	"email": {
 		"required": "email field is required",
@@ -40,5 +46,8 @@ var ValidationMessages = map[string]map[string]string{
 	},
 	"password": {
 		"required": "Password is required",
+	},
+	"code": {
+		"required": "Verification code is required",
 	},
 }

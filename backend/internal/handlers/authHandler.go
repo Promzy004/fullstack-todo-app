@@ -51,7 +51,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//send code to user email
-	mail.SendCode(input.Email, code)
+	sendErr := mail.SendCode(input.Email, code)
+	if sendErr != nil {
+		http.Error(w, sendErr.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Registration successful"})
@@ -173,6 +177,52 @@ func ResendCode(w http.ResponseWriter, r *http.Request) {
 	mail.SendCode(input.Email, code)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "verification sent"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "verification code sent"})
+}
+
+
+// verify email handler
+func Verify(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var input models.Verify
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Input"})
+		return
+	}
+
+	errors := utils.ValidateInput(input)
+	if len(errors) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]map[string]string {
+			"errors": errors,
+		})
+		return
+	}
+
+	var user models.User
+	err := config.DB.QueryRow("SELECT code FROM users WHERE email = ?", input.Email).Scan(&user.Code)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "User not found"})
+		return
+	}
+
+	if input.Code != user.Code {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid code entered"})
+		return
+	}
+
+	_, updateErr := config.DB.Exec("UPDATE users SET verified_at = ? WHERE email = ?", time.Now().UTC(), input.Email)
+	if updateErr != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Could not update user"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Verification successful"})
 }
 

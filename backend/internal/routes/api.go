@@ -13,6 +13,7 @@ func APIRoutes(r chi.Router) {
 	r.Post("/api/update/{id}", handlers.UpdateTask)
 	r.Post("/api/delete/{id}", handlers.DeleteTask)
 	r.Post("/api/auth/logout", handlers.Logout)
+	r.Post("/api/auth/verify", handlers.Verify)
 	r.Post("/api/auth/login", handlers.Login)
 	r.Get("/api/tasks", handlers.GetTasks)
 }
