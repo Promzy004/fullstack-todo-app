@@ -30,6 +30,13 @@ type Verify struct {
 	Code string `json:"code" validate:"required"`
 }
 
+type Update struct {
+	Email *string `json:"email" validate:"omitempty,email"`
+	Firstname *string	`json:"firstname" validate:"omitempty,min=3"`
+	Lastname *string 	`json:"lastname" validate:"omitempty,min=3"`
+	Password *string		`json:"password" validate:"omitempty,min=6"`
+}
+
 var ValidationMessages = map[string]map[string]string{
 	"email": {
 		"required": "email field is required",
@@ -46,6 +53,7 @@ var ValidationMessages = map[string]map[string]string{
 	},
 	"password": {
 		"required": "Password is required",
+		"min": "lastname must not be less than 6 characters",
 	},
 	"code": {
 		"required": "Verification code is required",

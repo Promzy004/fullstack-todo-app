@@ -215,7 +215,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, updateErr := config.DB.Exec("UPDATE users SET verified_at = ? WHERE email = ?", time.Now().UTC(), input.Email)
+	_, updateErr := config.DB.Exec("UPDATE users SET verified_at = ?, code = ? WHERE email = ?", time.Now().UTC(), nil, input.Email)
 	if updateErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Could not update user"})
@@ -224,5 +224,97 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Verification successful"})
+}
+
+// handler to update user information(only auth users)
+func UpdateInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//decodes the incoming json
+	var input models.Update
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Input"})
+		return
+	}
+
+	// get user id from token sent through request
+	userID, tokenError := utils.ExtractUserIDFromCookie(r)
+	if tokenError != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": tokenError.Error()})
+		return
+	}
+	
+	// validate input it passes the criteria required
+	validateErrors := utils.ValidateInput(input)
+	if len(validateErrors) > 0 {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]any{"errors": validateErrors})
+		return
+	}
+
+	// write a query for each field needed for change
+	var query string
+	var value string
+	var updatedField string
+
+	if (input.Email == nil) {
+		if (input.Firstname != nil) {
+			query = "UPDATE users SET firstname = ? WHERE id = ?"
+			value = *input.Firstname
+			updatedField = "firstname"
+		} else if (input.Lastname != nil) {
+			query = "UPDATE users SET lastname = ? WHERE id = ?"
+			value = *input.Lastname
+			updatedField = "lastname"
+		} else if (input.Password != nil) {
+			hashPassword,_ := bcrypt.GenerateFromPassword([]byte(*input.Password), 12)
+			query = "UPDATE users SET password = ? WHERE id = ?"
+			value = string(hashPassword)
+			updatedField = "password"
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{"message": "one field must be required (firstname, lastname, email, password)"})
+			return
+		}
+	
+		// update the information in the db
+		_,updateError := config.DB.Exec(query, value, userID)
+		if updateError != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"message": "unable to update " + updatedField})
+			return
+		}
+	
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"message": updatedField + " updated successfully"})
+	} else {
+
+		code := utils.GenerateCode()
+
+		query = "UPDATE users SET email = ?, verified_at = ?, code = ? WHERE id = ?"
+		value = *input.Email
+		updatedField = "email"
+
+		// update the email,verified at and code in the db
+		_,updateError := config.DB.Exec(query, value, nil, code, userID)
+		if updateError != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"message": "unable to update " + updatedField})
+			return
+		}
+
+		// sends the code to the user email
+		mailError := mail.SendCode(value, code)
+		if mailError != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"message": mailError.Error()})
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"message": updatedField + " updated successfully"})
+	}
 }
 

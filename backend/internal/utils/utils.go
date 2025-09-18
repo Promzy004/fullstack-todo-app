@@ -73,7 +73,7 @@ func GenerateToken(userID int, userFirstname string, userLastname string, userEm
 // ExtractUserIDFromCookie extracts the JWT from the "token" cookie and returns the userID
 func ExtractUserIDFromCookie(r *http.Request) (int, error) {
     // Get the cookie
-    cookie, err := r.Cookie("token")
+    cookie, err := r.Cookie("todo-token")
     if err != nil {
         return 0, fmt.Errorf("no token cookie found")
     }
