@@ -1,12 +1,24 @@
 package models
 
+import "github.com/golang-jwt/jwt/v5"
+
 type User struct {
 	ID       int    `json:"id"`
 	Firstname string `json:"firstname"`
 	Lastname string `json:"lastname"`
 	Email    string `json:"email"`
+	VerifiedAt string `json:"verified_at"`
 	Code    string `json:"-"`
 	Password string `json:"-"` 
+}
+
+// Claims stored in the token
+type Claims struct {
+	UserID int 				`json:"user_id"`
+	UserFirstname string 	`json:"firstname"`
+	UserLastname string 	`json:"lastname"`
+	UserEmail string 		`json:"email"`
+	jwt.RegisteredClaims
 }
 
 type UserRegister struct {

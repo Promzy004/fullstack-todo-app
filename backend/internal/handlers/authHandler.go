@@ -84,21 +84,31 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	err := config.DB.QueryRow("SELECT id, firstname, lastname, email, password FROM users WHERE email = ?", input.Email).Scan(&user.ID, &user.Firstname, &user.Lastname, &user.Email, &user.Password)
+	err := config.DB.QueryRow("SELECT id, firstname, lastname, email, password, verified_at FROM users WHERE email = ?", input.Email).Scan(&user.ID, &user.Firstname, &user.Lastname, &user.Email, &user.Password, &user.VerifiedAt)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]string{"message": "User not found"})
+		// json.NewEncoder(w).Encode(map[string]string{"errors": "User not found"})
+		json.NewEncoder(w).Encode(map[string]map[string]string {
+			"errors": {
+				"email": "Email does not exist",
+			},
+		})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"message": "password is incorrect"})
+		// json.NewEncoder(w).Encode(map[string]string{"message": "password is incorrect"})
+		json.NewEncoder(w).Encode(map[string]map[string]string {
+			"errors": {
+				"password": "Incorrect password",
+			},
+		})
 		return
 	}
 
 	// calls the GenerateToken function to generate the token
-	tokenString, err := utils.GenerateToken(user.ID, user.Firstname, user.Lastname, user.Email, 24*time.Hour)
+	tokenString, err := utils.GenerateToken(user.ID, 24*time.Hour)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Could not generate Token"})
@@ -116,7 +126,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
     })
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Login successful",})
+	json.NewEncoder(w).Encode(map[string]any{
+		"message": "Login successful",
+		"user": user,
+	})
 }
 
 
@@ -317,4 +330,33 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"message": updatedField + " updated successfully"})
 	}
 }
+
+
+// get logged in user
+func User(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+
+    // extract user ID from JWT in cookie
+    userID, err := utils.ExtractUserIDFromCookie(r)
+    if err != nil {
+        w.WriteHeader(http.StatusUnauthorized)
+        json.NewEncoder(w).Encode(map[string]string{"message": "Unauthorized"})
+        return
+    }
+
+    // fetch user info from DB
+    var user models.User
+    query := "SELECT id, firstname, lastname, email, verified_at FROM users WHERE id = ?"
+    dbErr := config.DB.QueryRow(query, userID).Scan(&user.ID, &user.Firstname, &user.Lastname, &user.Email, &user.VerifiedAt)
+    if dbErr != nil {
+        w.WriteHeader(http.StatusNotFound)
+        json.NewEncoder(w).Encode(map[string]string{"message": "User not found"})
+        return
+    }
+
+    // return user info
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(map[string]any{"user": user})
+}
+
 
