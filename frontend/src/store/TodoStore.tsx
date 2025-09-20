@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import api from "../api";
 
 interface TodoStoreType{
     showSidebar: boolean
@@ -9,6 +10,8 @@ interface TodoStoreType{
 
     activeMenuTab: string,
     setActiveMenuTab: (tab: string) => void
+
+    getAllTasks: () => Promise<any>
 }
 
 export const useTodoStore = create<TodoStoreType>((set) => ({
@@ -17,5 +20,15 @@ export const useTodoStore = create<TodoStoreType>((set) => ({
     activeMenuTab: 'Todos',
     setShowSidebar: (value) => set({showSidebar: value}),
     setActiveProgressTab: (value) => set({activeProgressTab: value}),
-    setActiveMenuTab: (tab) => set({activeMenuTab: tab})
+    setActiveMenuTab: (tab) => set({activeMenuTab: tab}),
+
+    getAllTasks: async () => {
+        try {
+            const res = await api.get("/api/tasks")
+            return res.data
+        } catch (err) {
+            console.log(err)
+            return {}
+        }
+    }
 }))

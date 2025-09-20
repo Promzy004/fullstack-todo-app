@@ -1,15 +1,21 @@
+import { useEffect } from "react";
 import { useTodoStore } from "../store/TodoStore";
 
 const TodoSection = () => {
 
     const activeProgressTab = useTodoStore(state => state.activeProgressTab)
     const setActiveProgressTab = useTodoStore(state => state.setActiveProgressTab)
+    const tasks = useTodoStore(state => state.getAllTasks)
 
     const porgressTab: string[] = ['All Tasks', 'Active', 'Completed']
 
     const handleActiveTab = (tab: string) => {
         setActiveProgressTab(tab)
     }
+
+    useEffect(() => {
+        console.log(tasks())
+    }, [])
 
     return (
         <main className="flex flex-col items-center p-6">
@@ -31,7 +37,9 @@ const TodoSection = () => {
                             placeholder-gray-400 dark:placeholder-gray-500
                             focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <button className="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <button 
+                    className="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
                 Add Task
                 </button>
             </div>
