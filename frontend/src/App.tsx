@@ -5,10 +5,14 @@ import Login from "./pages/Login"
 import Dashboard from "./layout/Dashboard"
 import TodoSection from "./pages/TodoSection"
 import Settings from "./pages/settings"
+import AuthRoute from "./AuthRoute"
+import { useAuthStore } from "./store/AuthStore"
+import UnAuthRoute from "./UnAuthRoute"
 
 function App() {
 
   const [ darkMode, setDarkMode ] = useState<boolean>(true)
+  const fetchUser = useAuthStore(state => state.fetchUser)
 
 
   useEffect(() => {
@@ -38,16 +42,26 @@ function App() {
     console.log(darkMode)
   }, [darkMode]);
 
+
+  useEffect(() => {
+    fetchUser(); // call on app mount
+  }, [fetchUser]);
+
   return (
     <div>
       <button onClick={() => setDarkMode(!darkMode)}>toggle</button>
       <Routes>
-        <Route path="/" element={<Dashboard />}>
-          <Route index element={<TodoSection />} />
-          <Route path="settings" element={<Settings />} />
+        <Route element={<AuthRoute />}>
+          <Route path="/" element={<Dashboard />}>
+            <Route index element={<TodoSection />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+
+        <Route element={<UnAuthRoute />}>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
       </Routes>
     </div>
   )
