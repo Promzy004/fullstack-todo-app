@@ -5,16 +5,58 @@ import { delay } from "../delay";
 interface IAuthStore {
     user: any
     loading: boolean
+    verifyModal: boolean
 
     login: (email: string, password: string) => Promise<any>
     fetchUser: () => Promise<void>
+    setVerifyModal: (value: boolean) => void
+    pendingEmail: string
 
     logout: () => Promise<any>
+
+    register: (email: string,firstname: string, lastname: string, password: string) => Promise<any>
+    handleVerify: (code: string, email: string) => Promise<any>;
 }
 
 export const useAuthStore = create<IAuthStore>((set) => ({
     user: null,
     loading: false,
+    verifyModal: false,
+    pendingEmail: "",
+
+    setVerifyModal: (value) => set({ verifyModal: value }),
+
+    register: async (email, firstname, lastname, password) => {
+        set({ loading: true })
+        await delay(5000)
+        try {
+            await api.post("/api/auth/register", {
+                email,
+                firstname,
+                lastname,
+                password
+            })
+
+            set({ loading: false , verifyModal: true , pendingEmail: email})
+            return { success: true };
+        } catch (err: any) {
+            set({ loading: false })
+            return { success: false, errors: err.response?.data || {errors: err.message}  };
+        }
+    },
+
+    handleVerify: async (code, email) => {
+        set({ loading: true })
+        await delay(3000)
+        try {
+            await api.post("/api/verify", { email, code });
+            set({ loading: false });
+            return { success: true };
+        } catch (err: any) {
+            set({ loading: false })
+            return { success: false, errors: err.response?.data || {errors: err.message}  };
+        }
+    },
 
     login: async (email, password) => {
         set({ loading: true })

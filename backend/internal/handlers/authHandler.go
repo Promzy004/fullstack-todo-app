@@ -46,7 +46,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]string{"message": "User already exist"})
+		json.NewEncoder(w).Encode(map[string]map[string]string{
+			"errors": {
+				"email": "User already exist",
+			},
+		})
 		return
 	}
 
