@@ -26,7 +26,7 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// query db
-	rows, err := config.DB.Query("SELECT id, task, completed, user_id FROM todos WHERE user_id = ?", userID)
+	rows, err := config.DB.Query("SELECT id, task, completed, user_id FROM todos WHERE user_id = ? ORDER BY created_at DESC", userID)
 	if err != nil {
 		http.Error(w, "Error fetching tasks", http.StatusInternalServerError)
 		return
@@ -96,8 +96,7 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := config.DB.Exec("UPDATE tasks SET title=?, completed=? WHERE id=? AND user_id=?",
-		task.Title, task.Completed, taskID, userID)
+	_, err := config.DB.Exec("UPDATE todos SET completed=? WHERE id=? AND user_id=?", task.Completed, taskID, userID)
 	if err != nil {
 		http.Error(w, "Error updating task", http.StatusInternalServerError)
 		return
@@ -105,7 +104,9 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 
 	task.ID = taskID
 	task.UserID = userID
-	json.NewEncoder(w).Encode(task)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "task updated",
+	})
 }
 
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
