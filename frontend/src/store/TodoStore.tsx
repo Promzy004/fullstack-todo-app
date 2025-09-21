@@ -13,6 +13,7 @@ interface TodoStoreType{
 
     createTask: (title: string) => Promise<void>
     getAllTasks: () => Promise<any>
+    updateTask: (id: number, completed: boolean) => Promise<void>
 }
 
 export const useTodoStore = create<TodoStoreType>((set) => ({
@@ -24,11 +25,7 @@ export const useTodoStore = create<TodoStoreType>((set) => ({
     setActiveMenuTab: (tab) => set({activeMenuTab: tab}),
 
     createTask: async (title) => {
-        try{
-            await api.post("/api/create-task", {title})
-        } catch (err) {
-            
-        }
+        await api.post("/api/create-task", {title})
     },
 
     getAllTasks: async () => {
@@ -37,7 +34,11 @@ export const useTodoStore = create<TodoStoreType>((set) => ({
             return res.data
         } catch (err) {
             console.log(err)
-            return {}
+            return []
         }
+    },
+
+    updateTask: async (id, completed) => {
+        await api.patch(`/api/update/${id}`, {completed})
     }
 }))
