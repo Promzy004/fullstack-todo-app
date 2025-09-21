@@ -13,10 +13,12 @@ import (
 )
 
 func GetTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	
 	userID, err := utils.ExtractUserIDFromCookie(r)
 
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{
 			"error": err.Error(),
 		})
@@ -38,11 +40,13 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&t.ID, &t.Title, &t.Completed, &t.UserID)
 		tasks = append(tasks, t)
 	}
+	
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tasks)
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
 	userID, err := utils.ExtractUserIDFromCookie(r)
 
 	if err != nil {

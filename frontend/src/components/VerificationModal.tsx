@@ -17,31 +17,31 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
   const [ codeError, setCodeError ] = useState("")
   const [ isVerified, setIsVerified ] = useState(false)
 
-  if (!isOpen) return null;
+    if (!isOpen) return null;
 
     const validate_input = () => {
         const regex = /[0-9]{6}/
 
-        if (!code) 'verification code is required'
-        if (!regex.test(code)) 'Code must be 6 digits only'
+        if (!code) return 'verification code is required'
+        if (!regex.test(code)) return 'Code must be 6 digits only'
         return '';
     }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const validatedError = validate_input();
-    setCodeError(validatedError)
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const validatedError = validate_input();
+        setCodeError(validatedError)
 
-    if(validatedError === '') {
-        const res = await handleVerify(code, pendingEmail)
-        if(res.success) {
-            setCode('')
-            setIsVerified(true)
-        } else {
-            setCodeError(res?.errors?.message)
+        if(validatedError === '') {
+            const res = await handleVerify(code, pendingEmail)
+            if(res.success) {
+                setCode('')
+                setIsVerified(true)
+            } else {
+                setCodeError(res?.errors?.message)
+            }
         }
-    }
-  };
+    };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
