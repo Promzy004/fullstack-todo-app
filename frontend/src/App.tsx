@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import Register from "./pages/Register"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import Login from "./pages/Login"
 import Dashboard from "./layout/Dashboard"
 import TodoSection from "./pages/TodoSection"
@@ -8,10 +8,13 @@ import Settings from "./pages/settings"
 import AuthRoute from "./AuthRoute"
 import { useAuthStore } from "./store/AuthStore"
 import UnAuthRoute from "./UnAuthRoute"
+import Toast from "./components/Toast"
+import { useTodoStore } from "./store/TodoStore"
 
 function App() {
 
-  const [ darkMode, setDarkMode ] = useState<boolean>(true)
+  const darkMode = useTodoStore(state => state.darkMode)
+  const setDarkMode = useTodoStore(state => state.setDarkMode)
   const fetchUser = useAuthStore(state => state.fetchUser)
 
 
@@ -49,7 +52,6 @@ function App() {
 
   return (
     <div>
-      <button onClick={() => setDarkMode(!darkMode)}>toggle</button>
       <Routes>
         <Route element={<AuthRoute />}>
           <Route path="/" element={<Dashboard />}>
@@ -63,6 +65,7 @@ function App() {
           <Route path="/login" element={<Login />} />
         </Route>
       </Routes>
+      <Toast />
     </div>
   )
 }
