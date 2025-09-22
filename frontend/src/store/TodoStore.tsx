@@ -2,6 +2,8 @@ import { create } from "zustand";
 import api from "../api";
 
 interface TodoStoreType{
+    darkMode: boolean
+    setDarkMode: (value: boolean) => void
     showSidebar: boolean
     setShowSidebar: (value: boolean) => void
 
@@ -17,6 +19,8 @@ interface TodoStoreType{
 }
 
 export const useTodoStore = create<TodoStoreType>((set) => ({
+    darkMode: true,
+    setDarkMode: (value) => set({ darkMode: value }),
     showSidebar: false,
     activeProgressTab: 'All Tasks',
     activeMenuTab: 'Todos',
