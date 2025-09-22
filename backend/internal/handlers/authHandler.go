@@ -14,6 +14,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+
+
 // register user handler
 func Register(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -94,7 +96,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		// json.NewEncoder(w).Encode(map[string]string{"errors": "User not found"})
 		json.NewEncoder(w).Encode(map[string]map[string]string {
 			"errors": {
-				"email": "Email does not exist",
+				"email": "user not found",
 			},
 		})
 		return
@@ -102,7 +104,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		// json.NewEncoder(w).Encode(map[string]string{"message": "password is incorrect"})
 		json.NewEncoder(w).Encode(map[string]map[string]string {
 			"errors": {
 				"password": "Incorrect password",

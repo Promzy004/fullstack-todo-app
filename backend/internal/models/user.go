@@ -1,13 +1,17 @@
 package models
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type User struct {
 	ID       int    `json:"id"`
 	Firstname string `json:"firstname"`
 	Lastname string `json:"lastname"`
 	Email    string `json:"email"`
-	VerifiedAt string `json:"verified_at"`
+	VerifiedAt *time.Time `json:"verified_at"`
 	Code    string `json:"-"`
 	Password string `json:"-"` 
 }
