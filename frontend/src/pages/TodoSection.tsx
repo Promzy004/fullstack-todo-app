@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTodoStore } from "../store/TodoStore";
+import { useToastStore } from "../store/ToastStore";
 
 
 interface Task {
@@ -17,6 +18,7 @@ const TodoSection = () => {
     const [ title, setTitle ] = useState("")
     const createTask = useTodoStore(state => state.createTask)
     const updateTask = useTodoStore(state => state.updateTask)
+    const showToast = useToastStore(state => state.showToast);
 
     const porgressTab: string[] = ['All Tasks', 'Active', 'Completed']
 
@@ -55,6 +57,7 @@ const TodoSection = () => {
             const data = await getAllTasks();
             setTasks(data);
             setTitle('');
+            showToast("Task created successfully", "success");
         }
     };
 
