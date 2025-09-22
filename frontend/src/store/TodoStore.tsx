@@ -16,6 +16,7 @@ interface TodoStoreType{
     createTask: (title: string) => Promise<void>
     getAllTasks: () => Promise<any>
     updateTask: (id: number, completed: boolean) => Promise<void>
+    deleteTask: (id: number) => Promise<void>
 }
 
 export const useTodoStore = create<TodoStoreType>((set) => ({
@@ -44,5 +45,9 @@ export const useTodoStore = create<TodoStoreType>((set) => ({
 
     updateTask: async (id, completed) => {
         await api.patch(`/api/update/${id}`, {completed})
-    }
+    },
+
+    deleteTask: async (id) => {
+        await api.delete(`api/delete/${id}`)
+    } 
 }))

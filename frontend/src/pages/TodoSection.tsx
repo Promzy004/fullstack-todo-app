@@ -19,6 +19,7 @@ const TodoSection = () => {
     const createTask = useTodoStore(state => state.createTask)
     const updateTask = useTodoStore(state => state.updateTask)
     const showToast = useToastStore(state => state.showToast);
+    const deleteTask = useTodoStore(state => state.deleteTask)
 
     const porgressTab: string[] = ['All Tasks', 'Active', 'Completed']
 
@@ -61,11 +62,32 @@ const TodoSection = () => {
         }
     };
 
-    const handleUpdateTask = async (e: React.ChangeEvent<HTMLInputElement>, id: number, completed: boolean) => {
+    // handles task creation using enter key
+    const handleTaskCreation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleCreateTask(e)
+        }
+    }
+
+    // handles update tasks, either completed or not completed
+    const handleUpdateTask = async (e: React.ChangeEvent<HTMLInputElement>, id: number, completed: boolean, title: string) => {
         e.preventDefault()
         await updateTask(id, completed);
         const data = await getAllTasks();
         setTasks(data);
+        const message = (completed ? `(${title}) task marked as completed` : `(${title}) task marked as not completed`)
+        const type = completed ? "success" : "info"
+        showToast(message, type);
+    }
+
+    // handles each task delete
+    const handleDeleteTask = async (e: React.MouseEvent<HTMLButtonElement> ,id: number, title: string) =>{
+        e.preventDefault()
+        await deleteTask(id)
+        const data = await getAllTasks();
+        setTasks(data);
+
+        showToast(`${title} task deleted`, "error")
     }
 
 
@@ -93,6 +115,7 @@ const TodoSection = () => {
                     placeholder="What needs to be done?"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    onKeyDown={(e) => handleTaskCreation(e)}
                     className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800  text-gray-900 dark:text-gray-100  placeholder-gray-400 dark:placeholder-gray-500focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button 
@@ -125,13 +148,18 @@ const TodoSection = () => {
                                 type="checkbox" 
                                 checked={task.completed} 
                                 className="form-checkbox" 
-                                onChange={(e) => handleUpdateTask(e, task.id, !task.completed)}
+                                onChange={(e) => handleUpdateTask(e, task.id, !task.completed, task.title)}
                             />
                             <span className={`text-gray-500 dark:text-gray-400 ${task.completed && "line-through"} break-words truncate`}>
                                 {task.title}
                             </span>
                         </div>
-                        <button className="px-2 py-1 text-red-500 hover:text-red-700">✕</button>
+                        <button 
+                            onClick={(e) => handleDeleteTask(e, task.id, task.title)}
+                            className="px-2 py-1 text-red-500 hover:text-red-700"
+                        >
+                            ✕
+                        </button>
                     </li>
                 ))}
             </ul>

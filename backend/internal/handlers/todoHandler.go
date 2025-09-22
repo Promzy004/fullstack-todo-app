@@ -114,7 +114,7 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	taskID, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
-	_, err := config.DB.Exec("DELETE FROM tasks WHERE id=? AND user_id=?", taskID, userID)
+	_, err := config.DB.Exec("DELETE FROM todos WHERE id=? AND user_id=?", taskID, userID)
 	if err != nil {
 		http.Error(w, "Error deleting task", http.StatusInternalServerError)
 		return
