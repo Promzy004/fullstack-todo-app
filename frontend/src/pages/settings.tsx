@@ -28,7 +28,7 @@ const Settings = () => {
   const resendCode = useAuthStore(state => state.resendCode)
 
   // random avatar from dicebear
-  const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${user.firstname}${user.lastname}`;
+  const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${user?.firstname}${user?.lastname}`;
 
   const handleEdit = (field: keyof User) => {
     setEditingField(field);
@@ -79,12 +79,16 @@ const Settings = () => {
 
     try {
       console.log("Updating password to:", newPassword);
+      await updateUserInfo("password", newPassword);
+      setEditingField(null);
+      showToast("Password Changed", "success")
+
       setShowPasswordForm(false);
       setNewPassword("");
       setConfirmPassword("");
       setError("");
     } catch (err) {
-      console.error("Failed to update password:", err);
+      showToast("Failed to update password", "error")
       setError("Failed to update password");
     }
   };

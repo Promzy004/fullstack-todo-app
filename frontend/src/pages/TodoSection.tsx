@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTodoStore } from "../store/TodoStore";
 import { useToastStore } from "../store/ToastStore";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 
 interface Task {
@@ -158,7 +159,7 @@ const TodoSection = () => {
                             onClick={(e) => handleDeleteTask(e, task.id, task.title)}
                             className="px-2 py-1 text-red-500 hover:text-red-700"
                         >
-                            ✕
+                            <RiDeleteBin6Line />
                         </button>
                     </li>
                 ))}

@@ -8,6 +8,7 @@ interface IUser {
     lastname: string
     email: string
     verified_at: string
+    password?: string
 }
 
 // store type
