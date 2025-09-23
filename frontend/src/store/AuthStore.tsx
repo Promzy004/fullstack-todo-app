@@ -2,8 +2,17 @@ import { create } from "zustand";
 import api from "../api";
 import { delay } from "../delay";
 
+// user type
+interface IUser {
+    firstname: string
+    lastname: string
+    email: string
+    verified_at: string
+}
+
+// store type
 interface IAuthStore {
-    user: any
+    user: IUser | null
     loading: boolean
     verifyModal: boolean
 
@@ -16,8 +25,11 @@ interface IAuthStore {
 
     register: (email: string,firstname: string, lastname: string, password: string) => Promise<any>
     handleVerify: (code: string, email: string) => Promise<any>;
+    updateUserInfo: (field: keyof IUser, value: string) => Promise<void>
+    resendCode: (email: string) => Promise<void>
 }
 
+// Zustand store
 export const useAuthStore = create<IAuthStore>((set) => ({
     user: null,
     loading: false,
@@ -26,6 +38,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
 
     setVerifyModal: (value) => set({ verifyModal: value }),
 
+    // register
     register: async (email, firstname, lastname, password) => {
         set({ loading: true })
         await delay(5000)
@@ -45,6 +58,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         }
     },
 
+    // verify
     handleVerify: async (code, email) => {
         set({ loading: true })
         await delay(3000)
@@ -58,6 +72,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         }
     },
 
+    //login
     login: async (email, password) => {
         set({ loading: true })
         await delay(5000)
@@ -77,6 +92,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         }
     },
 
+    //fetch user
     fetchUser: async () => {
         try{
             const res = await api.get("/api/user");
@@ -87,6 +103,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         }
     },
 
+    // logout 
     logout: async () => {
         set({ loading: true })
         await delay(5000)
@@ -98,5 +115,34 @@ export const useAuthStore = create<IAuthStore>((set) => ({
             set({ loading: false })
             set({ user: null })
         }
+    },
+
+    // update user info
+    updateUserInfo: async (field , value) => {
+        try{
+            await api.patch("api/update-info", {[field]: value});
+
+            // update store user object
+            set((state) => ({
+                user: {
+                    ...(state.user as IUser),
+                    [field]: value,
+                },
+            }));
+        } catch (err) {
+            throw err;
+        }
+    },
+
+    //verify email in app
+    resendCode: async (email) => {
+        await api.patch("/api/auth/resend-code", {email})
+        set({ pendingEmail: email })
+        set((state) => ({
+            user: {
+                ...(state.user as IUser),
+                [email]: email,
+            },
+        }));
     }
 }))

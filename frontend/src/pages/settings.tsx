@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useTodoStore } from "../store/TodoStore";
+import { useAuthStore } from "../store/AuthStore";
+import { useToastStore } from "../store/ToastStore";
+import VerificationModal from "../components/VerificationModal";
 
 interface User {
   firstname: string;
   lastname: string;
   email: string;
+  verified_at: string
 }
 
 const Settings = () => {
-  const [user, setUser] = useState<User>({
-    firstname: "John",
-    lastname: "Doe",
-    email: "johndoe@example.com",
-  });
 
   const [editingField, setEditingField] = useState<keyof User | null>(null);
   const [tempValue, setTempValue] = useState("");
@@ -22,19 +21,24 @@ const Settings = () => {
   const [error, setError] = useState("");
   const darkMode = useTodoStore(state => state.darkMode)
   const setDarkMode = useTodoStore(state => state.setDarkMode)
+  const user = useAuthStore(state => state.user)
+  const updateUserInfo = useAuthStore(state => state.updateUserInfo)
+  const showToast = useToastStore(state => state.showToast)
+  const [ verifyModal, setVerifyModal ] = useState(false)
+  const resendCode = useAuthStore(state => state.resendCode)
 
   // random avatar from dicebear
   const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${user.firstname}${user.lastname}`;
 
   const handleEdit = (field: keyof User) => {
     setEditingField(field);
-    setTempValue(user[field]);
+    setTempValue(user?.[field] || '')
   };
 
   const handleSave = async () => {
     if (!editingField) return;
 
-    const oldValue = user[editingField];
+    const oldValue = user?.[editingField];
     const newValue = tempValue.trim();
 
     if (oldValue === newValue) {
@@ -43,13 +47,25 @@ const Settings = () => {
     }
 
     try {
-      console.log(`Updating ${editingField} to`, newValue);
-      setUser({ ...user, [editingField]: newValue });
+      // call store action (which also calls backend + updates state)
+      await updateUserInfo(editingField, newValue);
       setEditingField(null);
+      showToast(`${editingField} updated`, "success")
+      if (editingField === "email") {
+        setVerifyModal(true)
+      }
     } catch (err) {
       console.error("Failed to update user info:", err);
+      showToast(`Failed to update ${editingField}`, "error")
+      setEditingField(null);
     }
   };
+
+  const handleVerifyEmail = async (e: React.MouseEvent<HTMLButtonElement>, email: string) => {
+    e.preventDefault()
+    await resendCode(email)
+    setVerifyModal(true)
+  }
 
   const handlePasswordSave = async () => {
     if (!newPassword || !confirmPassword) {
@@ -122,7 +138,7 @@ const Settings = () => {
             ) : (
               <div className="flex items-center space-x-3">
                 <span className="text-gray-900 dark:text-gray-100 font-medium">
-                  {user.firstname}
+                  {user?.firstname}
                 </span>
                 <button
                   onClick={() => handleEdit("firstname")}
@@ -155,7 +171,7 @@ const Settings = () => {
             ) : (
               <div className="flex items-center space-x-3">
                 <span className="text-gray-900 dark:text-gray-100 font-medium">
-                  {user.lastname}
+                  {user?.lastname}
                 </span>
                 <button
                   onClick={() => handleEdit("lastname")}
@@ -168,35 +184,45 @@ const Settings = () => {
           </div>
 
           {/* Email */}
-          <div className="flex items-center justify-between p-3 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900">
-            <span className="text-gray-700 dark:text-gray-300">Email</span>
-            {editingField === "email" ? (
-              <div className="flex space-x-2">
-                <input
-                  type="email"
-                  value={tempValue}
-                  onChange={(e) => setTempValue(e.target.value)}
-                  className="px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                />
-                <button
-                  onClick={handleSave}
-                  className="px-2 py-1 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <span className="text-gray-900 dark:text-gray-100 font-medium">
-                  {user.email}
-                </span>
-                <button
-                  onClick={() => handleEdit("email")}
-                  className="px-2 py-1 text-sm text-blue-600 hover:underline"
-                >
-                  Edit
-                </button>
-              </div>
+          <div className="flex flex-col">
+            <div className={`flex items-center justify-between p-3 rounded-md border bg-gray-50 dark:bg-gray-900 ${!user?.verified_at ? "border-yellow-400 dark:border-yellow-200" : "border-gray-300 dark:border-gray-600"}`}>
+              <span className="text-gray-700 dark:text-gray-300">Email</span>
+              {editingField === "email" ? (
+                <div className="flex space-x-2">
+                  <input
+                    type="email"
+                    value={tempValue}
+                    onChange={(e) => setTempValue(e.target.value)}
+                    className="px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  />
+                  <button
+                    onClick={handleSave}
+                    className="px-2 py-1 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                  >
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <span className="text-gray-900 dark:text-gray-100 font-medium">
+                    {user?.email}
+                  </span>
+                  <button
+                    onClick={() => handleEdit("email")}
+                    className="px-2 py-1 text-sm text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </button>
+                </div>
+              )}
+            </div>
+            {!user?.verified_at && (
+              <button 
+                onClick={(e) => handleVerifyEmail(e, user?.email || '')}
+                className="text-xs text-yellow-400 dark:text-yellow-200 self-end hover:underline"
+              >
+                verify email
+              </button>
             )}
           </div>
         </div>
@@ -258,8 +284,6 @@ const Settings = () => {
           <button
             onClick={() => {
               setDarkMode(!darkMode);
-              // hook your theme toggle functionality here
-              console.log("Theme toggled!", !darkMode ? "Dark" : "Light");
             }}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
               darkMode ? "bg-blue-600" : "bg-gray-300"
@@ -273,6 +297,11 @@ const Settings = () => {
           </button>
         </div>
       </div>
+      <VerificationModal 
+        isOpen={verifyModal}
+        onClose={() => setVerifyModal(false)}
+        userEmail={user?.email || ''}
+      />
     </main>
   );
 };

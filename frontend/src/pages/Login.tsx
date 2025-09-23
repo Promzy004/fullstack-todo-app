@@ -20,11 +20,9 @@ const Login = () => {
         password: '',
     })
     const [ formErrors, setFormErrors ] = useState<IFormErrors>({})
-    // const [ successMessage, setSuccessMessage ] = useState<string>('')
     const login = useAuthStore(state => state.login)
-    const user = useAuthStore(state => state.user)
     const loading = useAuthStore(state => state.loading)
-    console.log(loading)
+
 
     const validate_form = () => {
         const errors: IFormErrors = {}
@@ -50,10 +48,7 @@ const Login = () => {
 
         if (Object.keys(validation_errors).length === 0) {
             const resData = await login(formData.email, formData.password)
-            if (resData.success) {
-                console.log(resData)
-                console.log(user)
-            } else {
+            if (!resData.success) {
                 setFormErrors(resData?.errors?.errors)
             }
         }
