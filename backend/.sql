@@ -16,14 +16,16 @@ CREATE TABLE users (
 -- todos table with realtionship to user that created it 
 CREATE TABLE todos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    task VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
     completed BOOLEAN DEFAULT FALSE,
+    description TEXT,
+    due_date TIMESTAMP NULL,
+    priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
     deleted_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )
-
 
 
