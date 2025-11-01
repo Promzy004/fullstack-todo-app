@@ -138,12 +138,12 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     //verify email in app
     resendCode: async (email) => {
         await api.patch("/api/auth/resend-code", {email})
-        set({ pendingEmail: email })
-        set((state) => ({
-            user: {
-                ...(state.user as IUser),
-                [email]: email,
-            },
-        }));
+        // set({ pendingEmail: email })
+        // set((state) => ({
+        //     user: {
+        //         ...(state.user as IUser),
+        //         [email]: email,
+        //     },
+        // }));
     }
 }))

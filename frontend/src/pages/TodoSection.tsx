@@ -142,27 +142,33 @@ const TodoSection = () => {
 
             {/* Task List */}
             <ul className="w-full max-w-xl space-y-4">
-                {filteredTasks.map((task, index) => (
-                    <li key={index} className="flex items-center justify-between p-4 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
-                        <div className="flex items-center space-x-2 flex-1 min-w-0">
-                            <input 
-                                type="checkbox" 
-                                checked={task.completed} 
-                                className="form-checkbox" 
-                                onChange={(e) => handleUpdateTask(e, task.id, !task.completed, task.title)}
-                            />
-                            <span className={`text-gray-500 dark:text-gray-400 ${task.completed && "line-through"} break-words truncate`}>
-                                {task.title}
-                            </span>
-                        </div>
-                        <button 
-                            onClick={(e) => handleDeleteTask(e, task.id, task.title)}
-                            className="px-2 py-1 text-red-500 hover:text-red-700"
-                        >
-                            <RiDeleteBin6Line />
-                        </button>
-                    </li>
-                ))}
+                {filteredTasks.length > 0 ?
+                    <>
+                        {filteredTasks.map((task, index) => (
+                            <li key={index} className="flex items-center justify-between p-4 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={task.completed} 
+                                        className="form-checkbox" 
+                                        onChange={(e) => handleUpdateTask(e, task.id, !task.completed, task.title)}
+                                    />
+                                    <span className={`text-gray-500 dark:text-gray-400 ${task.completed && "line-through"} break-words truncate`}>
+                                        {task.title}
+                                    </span>
+                                </div>
+                                <button 
+                                    onClick={(e) => handleDeleteTask(e, task.id, task.title)}
+                                    className="px-2 py-1 text-red-500 hover:text-red-700"
+                                >
+                                    <RiDeleteBin6Line />
+                                </button>
+                            </li>
+                        ))}
+                    </>
+                    :
+                    <div>No task added ...</div>
+                }
             </ul>
         </main>
     );

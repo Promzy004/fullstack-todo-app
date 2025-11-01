@@ -109,7 +109,7 @@ const Register = () => {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="flex items-center justify-center min-h-screen px-4 py-20">
             <div className="w-full max-w-md p-6 space-y-6 rounded-lg shadow-lg sm:p-8 bg-light dark:bg-dark">
                 {/* Title */}
                 <h1 className="text-2xl font-extrabold text-center sm:text-3xl">
@@ -135,7 +135,7 @@ const Register = () => {
                             name="firstname"
                             value={formData.firstname}
                             onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.firstname ? "border-red-400" : "border-gray-300"}`}
+                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.firstname ? "border-red-400" : "border-gray-300"}`}
                             placeholder="Enter your name"
                         />
                         {formErrors.firstname && <span className="text-[10px] text-red-500">{formErrors.firstname}</span>}

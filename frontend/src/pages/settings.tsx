@@ -28,7 +28,8 @@ const Settings = () => {
   const resendCode = useAuthStore(state => state.resendCode)
 
   // random avatar from dicebear
-  const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${user?.firstname}${user?.lastname}`;
+  // const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${user?.firstname}${user?.lastname}`;
+  const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=EdwinPromise`;
 
   const handleEdit = (field: keyof User) => {
     setEditingField(field);

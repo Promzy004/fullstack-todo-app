@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/AuthStore";
 import { BeatLoader } from "react-spinners";
 import { Link } from "react-router-dom";
@@ -10,12 +10,25 @@ interface VerificationModalProps {
 }
 
 const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }) => {
-  const [code, setCode] = useState("");
-  const handleVerify = useAuthStore(state => state.handleVerify)
-  const loading = useAuthStore(state => state.loading)
-  const pendingEmail = useAuthStore(state => state.pendingEmail)
-  const [ codeError, setCodeError ] = useState("")
-  const [ isVerified, setIsVerified ] = useState(false)
+    const [code, setCode] = useState("");
+    const handleVerify = useAuthStore(state => state.handleVerify)
+    const loading = useAuthStore(state => state.loading)
+    const pendingEmail = useAuthStore(state => state.pendingEmail)
+    const [ codeError, setCodeError ] = useState("")
+    const [ isVerified, setIsVerified ] = useState(false)
+    const resendCode = useAuthStore(state => state.resendCode)
+//   const [ codeResentCountDown, setCodeResentCountDown] = useState<number>(0)
+    const [countdown, setCountdown] = useState(0);
+
+    useEffect(() => {
+        let timer: ReturnType<typeof setInterval>;
+        if (countdown > 0) {
+        timer = setInterval(() => {
+            setCountdown((prev) => prev - 1);
+        }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [countdown]);
 
     if (!isOpen) return null;
 
@@ -26,6 +39,7 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
         if (!regex.test(code)) return 'Code must be 6 digits only'
         return '';
     }
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,6 +57,14 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
         }
     };
 
+    // handle resend code
+    const handleResendCode = async (e: React.MouseEvent<HTMLButtonElement>, email: string) => {
+        e.preventDefault()
+        await resendCode(email)
+
+        setCountdown(60);
+    }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       {/* Modal container */}
@@ -52,21 +74,35 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
                 {/* Title */}
                 <h2 className="mb-2 text-xl font-bold text-center">Verification</h2>
                 <p className="mb-6 text-sm text-center text-gray-600 dark:text-gray-400">
-                Please enter the verification code sent to {pendingEmail}.
+                Please enter the verification code sent to <span className="text-blue-400 underline">{pendingEmail}</span>.
                 </p>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="flex flex-col">
-                        <input
-                            type="text"
-                            maxLength={6}
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            placeholder="Enter 6-digit code"
-                            className={`w-full px-3 py-2 border rounded-md text-center tracking-[0.5em] text-lg font-mono bg-white dark:bg-gray-700 dark:border-gray-600focus:outline-none focus:ring-2 focus:ring-blue-500 ${codeError ? 'border-red-400' : 'border-gray-300'}`}
-                        />
-                        {codeError && <span className="text-[10px] text-red-500">{codeError}</span>}
+                    <div className="flex flex-col gap-1">
+                        <div className="flex flex-col">
+                            <input
+                                type="text"
+                                maxLength={6}
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                placeholder="Enter 6-digit code"
+                                className={`w-full px-3 py-2 border rounded-md text-center tracking-[0.5em] text-lg font-mono bg-white dark:bg-gray-700 dark:border-gray-600focus:outline-none focus:ring-2 focus:ring-blue-500 ${codeError ? 'border-red-400' : 'border-gray-300'}`}
+                            />
+                            {codeError && <span className="text-[10px] text-red-500">{codeError}</span>}
+                        </div>
+                        {countdown > 0 ? 
+                            <p className="text-xs text-blue-400 dark:text-blue-400 self-end">
+                                Resend available in {countdown}s
+                            </p>
+                            :
+                            <button 
+                                onClick={(e) => handleResendCode(e, pendingEmail)}
+                                className="text-xs text-blue-400 dark:text-blue-400 self-end hover:underline"
+                            >
+                                Resend Code
+                            </button>
+                        }
                     </div>
 
                 {/* Buttons */}

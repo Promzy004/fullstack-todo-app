@@ -93,7 +93,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := config.DB.QueryRow("SELECT id, firstname, lastname, email, password, verified_at FROM users WHERE email = ?", input.Email).Scan(&user.ID, &user.Firstname, &user.Lastname, &user.Email, &user.Password, &user.VerifiedAt)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		// json.NewEncoder(w).Encode(map[string]string{"errors": "User not found"})
 		json.NewEncoder(w).Encode(map[string]map[string]string {
 			"errors": {
 				"email": "user not found",
