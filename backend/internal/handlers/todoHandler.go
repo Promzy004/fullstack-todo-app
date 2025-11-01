@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -26,7 +27,7 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// query db
-	rows, err := config.DB.Query("SELECT id, task, completed, user_id FROM todos WHERE user_id = ? ORDER BY created_at DESC", userID)
+	rows, err := config.DB.Query("SELECT id, title, completed, description, due_date, priority, user_id FROM todos WHERE user_id = ? ORDER BY created_at DESC", userID)
 	if err != nil {
 		http.Error(w, "Error fetching tasks", http.StatusInternalServerError)
 		return
@@ -37,7 +38,7 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var t models.Task
-		rows.Scan(&t.ID, &t.Title, &t.Completed, &t.UserID)
+		rows.Scan(&t.ID, &t.Title, &t.Completed, &t.Description, &t.DueDate, &t.Priority, &t.UserID)
 		tasks = append(tasks, t)
 	}
 	
@@ -69,8 +70,8 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := config.DB.Exec("INSERT INTO todos (task, completed, user_id) VALUES (?, ?, ?)",
-		input.Title, false, userID)
+	res, err := config.DB.Exec("INSERT INTO todos (title, completed, description, priority, due_date, user_id) VALUES (?, ?, ?, ?, ?, ?)",
+		input.Title, false, input.Description, input.Priority, input.DueDate, userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -114,7 +115,7 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	taskID, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
-	_, err := config.DB.Exec("DELETE FROM todos WHERE id=? AND user_id=?", taskID, userID)
+	_, err := config.DB.Exec("UPDATE todos SET deleted_at = ? WHERE id=? AND user_id=?", time.Now().Add(time.Hour * 1), taskID, userID)
 	if err != nil {
 		http.Error(w, "Error deleting task", http.StatusInternalServerError)
 		return
