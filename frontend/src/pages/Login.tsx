@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/AuthStore";
 import { BeatLoader } from "react-spinners";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
 
 interface IFormData {
@@ -22,6 +23,7 @@ const Login = () => {
     const [ formErrors, setFormErrors ] = useState<IFormErrors>({})
     const login = useAuthStore(state => state.login)
     const loading = useAuthStore(state => state.loading)
+    const [ showPassword, setShowPassword ] = useState<boolean>(false)
 
 
     const validate_form = () => {
@@ -67,7 +69,7 @@ const Login = () => {
                 </p>
 
                 {/* Form */}
-                <form className="space-y-4">
+                <form className="flex flex-col gap-5">
                     {/* Email */}
                     <div className="flex flex-col">
                         <label
@@ -95,21 +97,30 @@ const Login = () => {
                         >
                             Password
                         </label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={formData.password}
-                            onChange={(e) => setFormData({...formData, password:e.target.value})}
-                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400 dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.password ? "border-red-400" : "border-gray-300"}`}
-                            placeholder="Enter your password"
-                        />
-                        {formErrors.password && <span className="text-[10px] text-red-500">{formErrors.password}</span>}
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                value={formData.password}
+                                onChange={(e) => setFormData({...formData, password:e.target.value})}
+                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400 dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.password ? "border-red-400" : "border-gray-300"}`}
+                                placeholder="Enter your password"
+                            />
+                            {formErrors.password && <span className="text-[10px] text-red-500">{formErrors.password}</span>}
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-0 translate-y-[50%] text-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full py-2 mt-6 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onClick={handleSubmit}
                     >
                         {loading ? 

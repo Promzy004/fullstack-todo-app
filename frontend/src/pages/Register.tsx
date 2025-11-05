@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuthStore } from "../store/AuthStore";
 import { BeatLoader } from "react-spinners";
 import VerificationModal from "../components/VerificationModal";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
 interface IFormData {
     firstname: string
@@ -33,6 +34,8 @@ const Register = () => {
     const loading = useAuthStore(state => state.loading)
     const verifyModal = useAuthStore(state => state.verifyModal)
     const setVerifyModal = useAuthStore(state => state.setVerifyModal)
+    const [ showPassword, setShowPassword ] = useState<boolean>(false)
+    const [ showCpassword, setShowCpassword ] = useState<boolean>(false)
 
 
 
@@ -120,7 +123,7 @@ const Register = () => {
                 </p>
 
                 {/* Form */}
-                <form className="space-y-4">
+                <form className="flex flex-col gap-5">
                     {/* Firstname */}
                     <div className="flex flex-col">
                         <label
@@ -189,16 +192,25 @@ const Register = () => {
                         >
                             Password
                         </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.password ? "border-red-400" : "border-gray-300"}`}
-                            placeholder="Enter your password"
-                        />
-                        {formErrors.password && <span className="text-[10px] text-red-500">{formErrors.password}</span>}
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.password ? "border-red-400" : "border-gray-300"}`}
+                                placeholder="Enter your password"
+                            />
+                            {formErrors.password && <span className="text-[10px] text-red-500">{formErrors.password}</span>}
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-0 translate-y-[50%] text-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Confirm Password */}
@@ -209,23 +221,32 @@ const Register = () => {
                         >
                             Confirm Password
                         </label>
-                        <input
-                        type="password"
-                        id="cpassword"
-                        name="cpassword"
-                        value={formData.cpassword}
-                            onChange={handleChange}
-                        className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.cpassword ? "border-red-400" : "border-gray-300"}`}
-                        placeholder="Confirm your password"
-                        />
-                        {formErrors.cpassword && <span className="text-[10px] text-red-500">{formErrors.cpassword}</span>}
+                        <div className="relative">
+                            <input
+                                type={showCpassword ? "text" : "password"}
+                                id="cpassword"
+                                name="cpassword"
+                                value={formData.cpassword}
+                                    onChange={handleChange}
+                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.cpassword ? "border-red-400" : "border-gray-300"}`}
+                                placeholder="Confirm your password"
+                            />
+                            {formErrors.cpassword && <span className="text-[10px] text-red-500">{formErrors.cpassword}</span>}
+                            <button
+                                type="button"
+                                onClick={() => setShowCpassword(!showCpassword)}
+                                className="absolute right-3 top-0 translate-y-[50%] text-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                {showCpassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Submit Button */}
                     <button
                         type="submit"
                         onClick={handleSubmit}
-                        className="w-full py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full py-2 mt-8 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         {loading ? 
                             <BeatLoader color="#fff" loading={loading} size={10} />
