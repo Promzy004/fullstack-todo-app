@@ -27,7 +27,7 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// query db
-	rows, err := config.DB.Query("SELECT id, title, completed, description, due_date, priority, user_id FROM todos WHERE user_id = ? ORDER BY created_at DESC", userID)
+	rows, err := config.DB.Query("SELECT id, title, completed, description, due_date, priority, user_id FROM todos WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC", userID)
 	if err != nil {
 		http.Error(w, "Error fetching tasks", http.StatusInternalServerError)
 		return
