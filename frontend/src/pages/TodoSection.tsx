@@ -134,7 +134,7 @@ const TodoSection = () => {
                                         {task.title}
                                     </span>
                                 </div>
-                                <div>
+                                <div className="flex">
                                     <button 
                                         onClick={(e) => handleDeleteTask(e, task.id, task.title)}
                                         className="px-2 py-1 text-red-500 hover:text-red-700"
@@ -142,6 +142,7 @@ const TodoSection = () => {
                                         <RiDeleteBin6Line />
                                     </button>
                                     <button
+                                        className="px-2 py-1 text-sm rounded-md text-white bg-blue-600 hover:bg-blue-700"
                                         onClick={(e) => navigateToDetail(e, task.id)}
                                     >
                                         detail

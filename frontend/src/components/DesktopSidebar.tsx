@@ -1,24 +1,27 @@
 import { Link, useLocation } from "react-router-dom";
+import type { ReactNode } from "react";
 import { useAuthStore } from "../store/AuthStore";
 import { BeatLoader } from "react-spinners";
-
+import { FaUser } from "react-icons/fa";
+import { GiNotebook } from "react-icons/gi";
 
 interface ISidebarTabs {
     title: string,
     path: string,
-    icon: string
+    icon: ReactNode
 }
+
 
 const sidebarTabs: ISidebarTabs[] = [
     {
         title: "Todos",
         path: "/",
-        icon: "📋"
+        icon: <GiNotebook />
     },
     {
         title: "Settings",
         path: "/settings",
-        icon: "⚙️"
+        icon: <FaUser />
     }
 ]
 

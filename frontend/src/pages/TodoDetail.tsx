@@ -1,7 +1,7 @@
 import { RiArrowLeftLine, RiDeleteBin6Line, RiCheckLine } from "react-icons/ri";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTodoStore } from "../store/TodoStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useToastStore } from "../store/ToastStore";
 
 const TodoDetail = () => {
@@ -15,20 +15,17 @@ const TodoDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
 
+  // fetch a particular task
   useEffect(() => {
-    const fetchTasks = async () => {
+    const fetchTask = async () => {
       if (id) {
         const data = await getATask(Number(id))
         setTask(data)
       }
     }
 
-    fetchTasks()
+    fetchTask()
   }, [])
-
-  useEffect(() => {
-    console.log(task)
-  }, [task])
 
   const priorityColors = {
     high: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
@@ -59,7 +56,7 @@ const TodoDetail = () => {
     <main className="w-full flex justify-center px-4 sm:px-6 lg:px-8 py-4">
       <div className="w-full p-6 sm:p-8">
         
-        {/* Header */}
+        {/* Heading */}
         <div className="flex items-center justify-between mb-10">
           <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
             <RiArrowLeftLine className="text-lg" />
@@ -79,7 +76,7 @@ const TodoDetail = () => {
           </div>
         </div>
 
-        {/* Title + Status */}
+        {/* Title and Status */}
         <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 break-words">
             {task.title}
@@ -92,7 +89,7 @@ const TodoDetail = () => {
           </span>
         </div>
 
-        {/* Metadata */}
+        {/* priority and due date */}
         <div className="flex flex-wrap items-center gap-3 mb-14">
           <span 
             className={`px-3 py-1 text-sm font-medium rounded-full ${
@@ -120,7 +117,7 @@ const TodoDetail = () => {
           </p>
         </section>
 
-        {/* Actions */}
+        {/* Action */}
         <div className="flex justify-end mt-8 space-x-3">
           <button 
             className="flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"

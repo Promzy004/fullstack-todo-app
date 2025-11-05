@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/AuthStore";
 import { BeatLoader } from "react-spinners";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface VerificationModalProps {
   isOpen: boolean;
@@ -12,13 +12,14 @@ interface VerificationModalProps {
 const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }) => {
     const [code, setCode] = useState("");
     const handleVerify = useAuthStore(state => state.handleVerify)
-    const loading = useAuthStore(state => state.loading)
+    const loadingVerify = useAuthStore(state => state.loadingVerify)
     const pendingEmail = useAuthStore(state => state.pendingEmail)
     const [ codeError, setCodeError ] = useState("")
     const [ isVerified, setIsVerified ] = useState(false)
     const resendCode = useAuthStore(state => state.resendCode)
 //   const [ codeResentCountDown, setCodeResentCountDown] = useState<number>(0)
     const [countdown, setCountdown] = useState(0);
+    const { pathname } = useLocation()
 
     useEffect(() => {
         let timer: ReturnType<typeof setInterval>;
@@ -108,18 +109,18 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
                 {/* Buttons */}
                 <div className="flex justify-between gap-3">
                     <button
-                    type="button"
-                    onClick={onClose}
-                    className="w-1/2 py-2 font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+                        type="button"
+                        onClick={onClose}
+                        className="w-1/2 py-2 font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
                     >
                     Cancel
                     </button>
                     <button
-                    type="submit"
-                    className="w-1/2 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+                        type="submit"
+                        className="w-1/2 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
                     >
-                        {loading ? 
-                            <BeatLoader color="#fff" loading={loading} size={10} />
+                        {loadingVerify ? 
+                            <BeatLoader color="#fff" loading={loadingVerify} size={10} />
                             :
                             <span>Verify</span>  
                         }
@@ -138,19 +139,23 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
                 </p>
 
                 <div className="flex justify-between gap-3">
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="w-1/2 py-2 font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
-                >
-                    Cancel
-                </button>
-                <Link
-                    to="/login"
-                    className="w-1/2 py-2 text-center font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-                >
-                    Go to Login
-                </Link>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="w-1/2 py-2 font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+                    >
+                        Cancel
+                    </button>
+
+                    {/* doesn't display go to login when verification is done while logged in */}
+                    {pathname !== '/settings' && (
+                        <Link
+                            to="/login"
+                            className="w-1/2 py-2 text-center font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+                        >
+                            Go to Login
+                        </Link>
+                    )}
                 </div>
             </>
         }

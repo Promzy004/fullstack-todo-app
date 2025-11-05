@@ -14,6 +14,7 @@ interface IUser {
 // store type
 interface IAuthStore {
     user: IUser | null
+    loadingVerify: boolean,
     loading: boolean
     verifyModal: boolean
     authChecked: boolean;
@@ -34,6 +35,7 @@ interface IAuthStore {
 // Zustand store
 export const useAuthStore = create<IAuthStore>((set) => ({
     user: null,
+    loadingVerify: false,
     loading: false,
     verifyModal: false,
     pendingEmail: "",
@@ -63,14 +65,18 @@ export const useAuthStore = create<IAuthStore>((set) => ({
 
     // verify
     handleVerify: async (code, email) => {
-        set({ loading: true })
+        set({ loadingVerify: true })
         await delay(3000)
         try {
             await api.post("/api/verify", { email, code });
-            set({ loading: false });
+            set({ loadingVerify: false });
+
+            // const fetchUser = useAuthStore.getState().fetchUser;
+            // await fetchUser();
+
             return { success: true };
         } catch (err: any) {
-            set({ loading: false })
+            set({ loadingVerify: false })
             return { success: false, errors: err.response?.data || {errors: err.message}  };
         }
     },
@@ -131,6 +137,9 @@ export const useAuthStore = create<IAuthStore>((set) => ({
                     [field]: value,
                 },
             }));
+            if (field == 'email') {
+                set({  pendingEmail: value })
+            }
         } catch (err) {
             throw err;
         }
@@ -139,12 +148,12 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     //verify email in app
     resendCode: async (email) => {
         await api.patch("/api/auth/resend-code", {email})
-        // set({ pendingEmail: email })
-        // set((state) => ({
-        //     user: {
-        //         ...(state.user as IUser),
-        //         [email]: email,
-        //     },
-        // }));
+        set({ pendingEmail: email })
+        set((state) => ({
+            user: {
+                ...(state.user as IUser),
+                [email]: email,
+            },
+        }));
     }
 }))
