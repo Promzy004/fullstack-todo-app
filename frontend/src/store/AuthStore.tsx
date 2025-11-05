@@ -16,6 +16,7 @@ interface IAuthStore {
     user: IUser | null
     loading: boolean
     verifyModal: boolean
+    authChecked: boolean;
 
     login: (email: string, password: string) => Promise<any>
     fetchUser: () => Promise<void>
@@ -36,6 +37,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     loading: false,
     verifyModal: false,
     pendingEmail: "",
+    authChecked: false,
 
     setVerifyModal: (value) => set({ verifyModal: value }),
 
@@ -95,12 +97,13 @@ export const useAuthStore = create<IAuthStore>((set) => ({
 
     //fetch user
     fetchUser: async () => {
+        set({ loading: true })
         try{
             const res = await api.get("/api/user");
             console.log(res)
-            set({ user: res.data.user, loading: false })
+            set({ user: res.data.user, loading: false, authChecked: true });
         } catch (error) {
-            set({ user: null, loading: false })
+            set({ user: null, loading: false, authChecked: true });
         }
     },
 
@@ -110,8 +113,6 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         await delay(5000)
         try{
             await api.post("/api/auth/logout")
-        } catch {
-            
         } finally {
             set({ loading: false })
             set({ user: null })

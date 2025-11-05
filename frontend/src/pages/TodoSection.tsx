@@ -1,28 +1,29 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTodoStore } from "../store/TodoStore";
 import { useToastStore } from "../store/ToastStore";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import AddTaskModal from "../components/AddTaskModal";
+import { useNavigate } from "react-router-dom";
 
-
-interface Task {
-  id: number
-  title: string
-  completed: boolean
-}
 
 const TodoSection = () => {
 
     const activeProgressTab = useTodoStore(state => state.activeProgressTab)
     const setActiveProgressTab = useTodoStore(state => state.setActiveProgressTab)
     const getAllTasks = useTodoStore(state => state.getAllTasks)
-    const [tasks, setTasks] = useState<Task[]>([])
-    const [ title, setTitle ] = useState("")
-    const createTask = useTodoStore(state => state.createTask)
+    const tasks = useTodoStore(state => state.tasks)
+    const setTasks = useTodoStore(state => state.setTasks)
     const updateTask = useTodoStore(state => state.updateTask)
     const showToast = useToastStore(state => state.showToast);
     const deleteTask = useTodoStore(state => state.deleteTask)
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const porgressTab: string[] = ['All Tasks', 'Active', 'Completed']
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    const navigate = useNavigate();
+
+    const progressTab: string[] = ['All Tasks', 'Active', 'Completed']
 
     const handleActiveTab = (tab: string) => {
         setActiveProgressTab(tab)
@@ -42,33 +43,6 @@ const TodoSection = () => {
         console.log(tasks)
     }, [tasks])
 
-
-    const validate_input = () => {
-        if (!title) return 'add task title is required'
-        return ''
-    }
-
-    // creates new task and re-fetch all tasks from db again
-    const handleCreateTask = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const validatedError = validate_input();
-        console.log(validatedError)
-
-        if(validatedError === '') {
-            await createTask(title);
-            const data = await getAllTasks();
-            setTasks(data);
-            setTitle('');
-            showToast("Task created successfully", "success");
-        }
-    };
-
-    // handles task creation using enter key
-    const handleTaskCreation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            handleCreateTask(e)
-        }
-    }
 
     // handles update tasks, either completed or not completed
     const handleUpdateTask = async (e: React.ChangeEvent<HTMLInputElement>, id: number, completed: boolean, title: string) => {
@@ -99,9 +73,15 @@ const TodoSection = () => {
         return true;
     });
 
+    const navigateToDetail = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+        e.preventDefault()
+        navigate(`/task/${id}`)
+    }
+
 
     return (
         <main className="flex flex-col items-center p-6">
+            <AddTaskModal open={isModalOpen} onClose={closeModal} />
             {/* Header */}
             <div className="text-center mb-6">
                 <p className="text-gray-600 dark:text-gray-400">
@@ -114,14 +94,11 @@ const TodoSection = () => {
                 <input
                     type="text"
                     placeholder="What needs to be done?"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    onKeyDown={(e) => handleTaskCreation(e)}
                     className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800  text-gray-900 dark:text-gray-100  placeholder-gray-400 dark:placeholder-gray-500focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button 
                     className="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    onClick={handleCreateTask}
+                    onClick={openModal}
                 >
                     Add Task
                 </button>
@@ -129,7 +106,7 @@ const TodoSection = () => {
 
             {/* Tabs */}
             <div className="flex w-full max-w-xl mb-6 border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
-                {porgressTab.map((tab, index) => (
+                {progressTab.map((tab, index) => (
                     <button 
                         key={index}
                         className={`flex-1 px-4 py-2 transition-all duration-300 ${activeProgressTab === tab ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
@@ -157,17 +134,31 @@ const TodoSection = () => {
                                         {task.title}
                                     </span>
                                 </div>
-                                <button 
-                                    onClick={(e) => handleDeleteTask(e, task.id, task.title)}
-                                    className="px-2 py-1 text-red-500 hover:text-red-700"
-                                >
-                                    <RiDeleteBin6Line />
-                                </button>
+                                <div>
+                                    <button 
+                                        onClick={(e) => handleDeleteTask(e, task.id, task.title)}
+                                        className="px-2 py-1 text-red-500 hover:text-red-700"
+                                    >
+                                        <RiDeleteBin6Line />
+                                    </button>
+                                    <button
+                                        onClick={(e) => navigateToDetail(e, task.id)}
+                                    >
+                                        detail
+                                    </button>
+                                </div>
                             </li>
                         ))}
                     </>
                     :
-                    <div>No task added ...</div>
+                    (activeProgressTab === 'Active') ? (
+                        <div>No active task ...</div>
+                    ) : (activeProgressTab === 'Completed') ? (
+                        <div>No task completed yet ...</div>
+                    ) : (
+                        <div>No task added ...</div>
+                    )
+
                 }
             </ul>
         </main>

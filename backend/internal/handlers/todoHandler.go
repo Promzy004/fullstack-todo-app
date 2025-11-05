@@ -123,3 +123,19 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(map[string]string{"message": "Task deleted"})
 }
+
+func GetATask(w http.ResponseWriter, r *http.Request) {
+	userID, _ := utils.ExtractUserIDFromCookie(r)
+
+	taskID, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	var t models.Task
+	err := config.DB.QueryRow("SELECT id, title, completed, description, due_date, priority, user_id FROM todos WHERE id = ? AND user_id = ?", taskID, userID).Scan(&t.ID, &t.Title, &t.Completed, &t.Description, &t.DueDate, &t.Priority, &t.UserID)
+	if err != nil {
+		http.Error(w, "Error fetching task", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(t)
+}

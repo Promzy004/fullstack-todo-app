@@ -10,6 +10,7 @@ import { useAuthStore } from "./store/AuthStore"
 import UnAuthRoute from "./UnAuthRoute"
 import Toast from "./components/Toast"
 import { useTodoStore } from "./store/TodoStore"
+import TodoDetail from "./pages/TodoDetail"
 
 function App() {
 
@@ -57,6 +58,7 @@ function App() {
           <Route path="/" element={<Dashboard />}>
             <Route index element={<TodoSection />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="task/:id" element={<TodoDetail />} />
           </Route>
         </Route>
 

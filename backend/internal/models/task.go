@@ -11,5 +11,4 @@ type Task struct {
 	Description *string `json:"description"`
 	DueDate   *time.Time `json:"due_date"`
 	Priority  *string `json:"priority"`
-	DeletedAt *string `json:"-"`
 }
