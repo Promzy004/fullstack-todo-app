@@ -15,6 +15,7 @@ interface IUser {
 interface IAuthStore {
     user: IUser | null
     loadingVerify: boolean,
+    logoutLoading: boolean,
     loading: boolean
     verifyModal: boolean
     authChecked: boolean;
@@ -36,6 +37,7 @@ interface IAuthStore {
 export const useAuthStore = create<IAuthStore>((set) => ({
     user: null,
     loadingVerify: false,
+    logoutLoading: false,
     loading: false,
     verifyModal: false,
     pendingEmail: "",
@@ -115,12 +117,12 @@ export const useAuthStore = create<IAuthStore>((set) => ({
 
     // logout 
     logout: async () => {
-        set({ loading: true })
+        set({ logoutLoading: true })
         await delay(5000)
         try{
             await api.post("/api/auth/logout")
         } finally {
-            set({ loading: false })
+            set({ logoutLoading: false })
             set({ user: null })
         }
     },

@@ -30,7 +30,7 @@ const DesktopSidebar = () => {
     const location = useLocation()
     const pathname = location.pathname
     const logout = useAuthStore(state => state.logout)
-    const loading = useAuthStore(state => state.loading)
+    const logoutLoading = useAuthStore(state => state.logoutLoading)
 
     return (
         <aside className="hidden md:flex w-56 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 flex-col">
@@ -55,8 +55,8 @@ const DesktopSidebar = () => {
                     onClick={logout}
                     className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
-                    {loading ? 
-                        <BeatLoader color="#fff" loading={loading} size={10} />
+                    {logoutLoading ? 
+                        <BeatLoader color="#fff" loading={logoutLoading} size={10} />
                         :
                         <span>Logout</span>  
                     }

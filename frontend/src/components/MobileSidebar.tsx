@@ -1,25 +1,28 @@
-import { Link, useLocation } from "react-router-dom";
 import { useTodoStore } from "../store/TodoStore";
+import { Link, useLocation } from "react-router-dom";
+import type { ReactNode } from "react";
 import { useAuthStore } from "../store/AuthStore";
 import { BeatLoader } from "react-spinners";
+import { FaUser } from "react-icons/fa";
+import { GiNotebook } from "react-icons/gi";
 
 
 interface ISidebarTabs {
     title: string,
     path: string,
-    icon: string
+    icon: ReactNode
 }
 
 const sidebarTabs: ISidebarTabs[] = [
     {
         title: "Todos",
         path: "/",
-        icon: "📋"
+        icon: <GiNotebook />
     },
     {
         title: "Settings",
         path: "/settings",
-        icon: "⚙️"
+        icon: <FaUser />
     }
 ]
 
@@ -30,7 +33,7 @@ const MobileSidebar = () => {
     const location = useLocation()
     const pathname = location.pathname
     const logout = useAuthStore(state => state.logout)
-    const loading = useAuthStore(state => state.loading)
+    const logoutLoading = useAuthStore(state => state.logoutLoading)
 
     const stop = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
@@ -68,8 +71,8 @@ const MobileSidebar = () => {
                         onClick={logout}
                         className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
-                        {loading ?
-                            <BeatLoader color="#fff" loading={loading} size={10} />
+                        {logoutLoading ?
+                            <BeatLoader color="#fff" loading={logoutLoading} size={10} />
                             :
                             <span>Logout</span> 
                         }
