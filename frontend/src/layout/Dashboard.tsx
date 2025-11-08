@@ -18,7 +18,7 @@ const Dashboard = () => {
             {/* Main content */}
             <div className="flex-1 flex flex-col overflow-y-auto">
                 {/* Top navbar */}
-                <header className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <header className="flex fixed w-full items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     {/* Hamburger (mobile only) */}
                     <button
                         className="md:hidden p-2 rounded-md text-2xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -33,7 +33,9 @@ const Dashboard = () => {
                 </header>
 
                 {/* Content */}
-                <Outlet />
+                <div className="mt-16">
+                    <Outlet />
+                </div>
             </div>
         </div>
     );
