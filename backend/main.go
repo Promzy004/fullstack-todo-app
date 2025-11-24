@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"todo-app/internal/routes"
@@ -14,7 +15,12 @@ import (
 )
 
 func main() {
-	config.LoadEnv()
+	// DO NOT load local .env in production
+	// Only load .env if running locally
+	if os.Getenv("RAILWAY_ENVIRONMENT") == "" {
+		config.LoadEnv()
+	}
+	
 	port := os.Getenv("PORT")
 	r := chi.NewRouter()
 	r.Use(middlewares.CORSMiddleware)
@@ -27,5 +33,5 @@ func main() {
 
 	fmt.Println("Server is running ...")
 	fmt.Printf("Running server on [http://127.0.0.1:%s]\n", port)
-	http.ListenAndServe(":"+port, r)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
