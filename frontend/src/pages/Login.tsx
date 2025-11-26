@@ -83,10 +83,10 @@ const Login = () => {
                             id="email"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email:e.target.value})}
-                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400 dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.email ? "border-red-400" : "border-gray-300"}`}
+                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400 dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.email ? "border-red-400" : "border-gray-300"}`}
                             placeholder="Enter your email"
                         />
-                        {formErrors.email && <span className="text-[10px] text-red-500">{formErrors.email}</span>}
+                        {formErrors?.email && <span className="text-[10px] text-red-500">{formErrors?.email}</span>}
                     </div>
 
                     {/* Password */}
@@ -103,10 +103,10 @@ const Login = () => {
                                 id="password"
                                 value={formData.password}
                                 onChange={(e) => setFormData({...formData, password:e.target.value})}
-                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400 dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.password ? "border-red-400" : "border-gray-300"}`}
+                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400 dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.password ? "border-red-400" : "border-gray-300"}`}
                                 placeholder="Enter your password"
                             />
-                            {formErrors.password && <span className="text-[10px] text-red-500">{formErrors.password}</span>}
+                            {formErrors?.password && <span className="text-[10px] text-red-500">{formErrors?.password}</span>}
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}

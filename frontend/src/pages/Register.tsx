@@ -145,7 +145,7 @@ const Register = () => {
                             className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.firstname ? "border-red-400" : "border-gray-300"}`}
                             placeholder="Enter your name"
                         />
-                        {formErrors.firstname && <span className="text-[10px] text-red-500">{formErrors.firstname}</span>}
+                        {formErrors?.firstname && <span className="text-[10px] text-red-500">{formErrors?.firstname}</span>}
                     </div>
 
                     {/* Lastname */}
@@ -162,10 +162,10 @@ const Register = () => {
                             name="lastname"
                             value={formData.lastname}
                             onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.lastname ? "border-red-400" : "border-gray-300"}`}
+                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.lastname ? "border-red-400" : "border-gray-300"}`}
                             placeholder="Enter your name"
                         />
-                        {formErrors.lastname && <span className="text-[10px] text-red-500">{formErrors.lastname}</span>}
+                        {formErrors?.lastname && <span className="text-[10px] text-red-500">{formErrors?.lastname}</span>}
                     </div>
 
                     {/* Email */}
@@ -182,10 +182,10 @@ const Register = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.email ? "border-red-400" : "border-gray-300"}`}
+                            className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.email ? "border-red-400" : "border-gray-300"}`}
                             placeholder="Enter your email"
                         />
-                        {formErrors.email && <span className="text-[10px] text-red-500">{formErrors.email}</span>}
+                        {formErrors?.email && <span className="text-[10px] text-red-500">{formErrors?.email}</span>}
                     </div>
 
                     {/* Password */}
@@ -203,10 +203,10 @@ const Register = () => {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.password ? "border-red-400" : "border-gray-300"}`}
+                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.password ? "border-red-400" : "border-gray-300"}`}
                                 placeholder="Enter your password"
                             />
-                            {formErrors.password && <span className="text-[10px] text-red-500">{formErrors.password}</span>}
+                            {formErrors?.password && <span className="text-[10px] text-red-500">{formErrors?.password}</span>}
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
@@ -232,10 +232,10 @@ const Register = () => {
                                 name="cpassword"
                                 value={formData.cpassword}
                                     onChange={handleChange}
-                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.cpassword ? "border-red-400" : "border-gray-300"}`}
+                                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-400  dark:bg-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors?.cpassword ? "border-red-400" : "border-gray-300"}`}
                                 placeholder="Confirm your password"
                             />
-                            {formErrors.cpassword && <span className="text-[10px] text-red-500">{formErrors.cpassword}</span>}
+                            {formErrors?.cpassword && <span className="text-[10px] text-red-500">{formErrors?.cpassword}</span>}
                             <button
                                 type="button"
                                 onClick={() => setShowCpassword(!showCpassword)}
