@@ -43,7 +43,6 @@ function App() {
       html.classList.add('text-[#333333]', 'bg-[#fbf9f9]')
       localStorage.setItem('theme', 'light')
     }
-    console.log(darkMode)
   }, [darkMode]);
 
 

@@ -74,7 +74,6 @@ const AddTaskModal = ({ open, onClose }: AddTaskModalProps) => {
     const handleCreateTask = async (e: React.FormEvent) => {
         e.preventDefault();
         const validatedError = validate_input();
-        console.log(validatedError)
 
         if(validatedError === '') {
             const dueDateTimestamp = formData.due_date ? new Date(formData.due_date) : new Date();
@@ -91,12 +90,6 @@ const AddTaskModal = ({ open, onClose }: AddTaskModalProps) => {
             showToast("Task created successfully", "success");
         }
     };
-
-    useEffect(() => {
-        console.log(formData)
-        const test = formData.due_date ? new Date(formData.due_date).toISOString() : new Date
-        console.log("due date:", typeof test, test)
-    }, [formData])
 
     return (
         <AnimatePresence>
