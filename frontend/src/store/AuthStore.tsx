@@ -48,7 +48,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     // register
     register: async (email, firstname, lastname, password) => {
         set({ loading: true })
-        await delay(5000)
+        await delay(500)
         try {
             await api.post("/api/auth/register", {
                 email,
@@ -68,7 +68,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     // verify
     handleVerify: async (code, email) => {
         set({ loadingVerify: true })
-        await delay(3000)
+        await delay(500)
         try {
             await api.post("/api/verify", { email, code });
             set({ loadingVerify: false });
@@ -86,7 +86,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     //login
     login: async (email, password) => {
         set({ loading: true })
-        await delay(5000)
+        await delay(500)
         try {
             await api.post("/api/auth/login", {
                 email,
@@ -118,7 +118,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     // logout 
     logout: async () => {
         set({ logoutLoading: true })
-        await delay(5000)
+        await delay(500)
         try{
             await api.post("/api/auth/logout")
         } finally {
@@ -151,11 +151,11 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     resendCode: async (email) => {
         await api.patch("/api/auth/resend-code", {email})
         set({ pendingEmail: email })
-        set((state) => ({
-            user: {
-                ...(state.user as IUser),
-                [email]: email,
-            },
-        }));
+        // set((state) => ({
+        //     user: {
+        //         ...(state.user as IUser),
+        //         [email]: email,
+        //     },
+        // }));
     }
 }))

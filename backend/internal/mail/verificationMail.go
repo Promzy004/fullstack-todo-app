@@ -1,19 +1,29 @@
+
 package mail
 
 import (
     "fmt"
     "os"
+    "strconv"
     "strings"
 
-    "github.com/resend/resend-go/v2"
+    "gopkg.in/gomail.v2"
 )
 
-func SendCode(to string, otp string) error {
-    client := resend.NewClient(os.Getenv("RESEND_API_KEY"))
 
-    appName := os.Getenv("MAIL_FROM_NAME")
-    if appName == "" {
-        appName = "Todo App"
+func SendCode(to string, otp string) error {
+
+
+    m := gomail.NewMessage()
+    from_email := os.Getenv("MAIL_FROM_ADDRESS")
+    app_name := os.Getenv("MAIL_FROM_NAME")
+    password := os.Getenv("MAIL_PASSWORD")
+    port := os.Getenv("MAIL_PORT")
+    host := os.Getenv("MAIL_HOST")
+    mail_port, _ := strconv.Atoi(port)
+
+    if from_email == "" || password == "" || port == "" || host == "" || app_name == "" {
+        fmt.Printf("MAIL_FROM_ADDRESS, MAIL_PORT, MAIL_HOST, MAIL_FROM_NAME or MAIL_PASSWORD not set in environment")
     }
 
     htmlTemplate := `
@@ -35,20 +45,18 @@ func SendCode(to string, otp string) error {
 
     htmlBody := strings.ReplaceAll(htmlTemplate, "{{OTP_CODE}}", otp)
 
-    // Use Resend default sender → NO DOMAIN VERIFICATION NEEDED
-    from := fmt.Sprintf("%s <onboarding@resend.dev>", appName)
+    //format address so as to display both in mail 
+    m.SetHeader("From", m.FormatAddress(from_email, app_name))
+    m.SetHeader("To", to)
+    m.SetHeader("Subject", "Verification OTP")
+    m.SetBody("text/html", htmlBody)
 
-    params := &resend.SendEmailRequest{
-        From:    from,
-        To:      []string{to},
-        Subject: "Verification OTP",
-        Html:    htmlBody,
-    }
-
-    _, err := client.Emails.Send(params)
-    if err != nil {
+    d := gomail.NewDialer(host, mail_port, from_email, password)
+    // Send the email
+    if err := d.DialAndSend(m); err != nil {
         return fmt.Errorf("failed to send email: %v", err)
     }
-
     return nil
+
 }
+
