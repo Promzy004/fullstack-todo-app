@@ -17,7 +17,6 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
     const [ codeError, setCodeError ] = useState("")
     const [ isVerified, setIsVerified ] = useState(false)
     const resendCode = useAuthStore(state => state.resendCode)
-//   const [ codeResentCountDown, setCodeResentCountDown] = useState<number>(0)
     const [countdown, setCountdown] = useState(0);
     const { pathname } = useLocation()
 

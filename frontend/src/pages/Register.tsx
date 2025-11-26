@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/AuthStore";
 import { BeatLoader } from "react-spinners";
 import VerificationModal from "../components/VerificationModal";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { useToastStore } from "../store/ToastStore";
 
 interface IFormData {
     firstname: string
@@ -36,6 +37,7 @@ const Register = () => {
     const setVerifyModal = useAuthStore(state => state.setVerifyModal)
     const [ showPassword, setShowPassword ] = useState<boolean>(false)
     const [ showCpassword, setShowCpassword ] = useState<boolean>(false)
+    const showToast = useToastStore(state => state.showToast)
 
 
 
@@ -105,8 +107,10 @@ const Register = () => {
                     password: '',
                     cpassword: ''
                 })
+            } else if (resData.errors) {
+                setFormErrors(resData.errors)
             } else {
-                setFormErrors(resData?.errors?.errors)
+                showToast("Registration failed. Please try again.", "error")
             }
         }
     }
