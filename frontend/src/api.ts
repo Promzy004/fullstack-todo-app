@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // Base URL of your server
-const API_URL = "http://localhost:8001"; 
+const API_URL = "https://fullstack-todo-app-production-f8a3.up.railway.app"; 
 
 // Create axios instance
 const api = axios.create({

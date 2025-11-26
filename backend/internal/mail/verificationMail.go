@@ -13,7 +13,7 @@ func SendCode(to string, otp string) error {
 
     appName := os.Getenv("MAIL_FROM_NAME")
     if appName == "" {
-        appName = "My App"
+        appName = "Todo App"
     }
 
     htmlTemplate := `

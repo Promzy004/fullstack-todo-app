@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTodoStore } from "../store/TodoStore";
 import { useAuthStore } from "../store/AuthStore";
 import { useToastStore } from "../store/ToastStore";
 import VerificationModal from "../components/VerificationModal";
-import { useLocation } from "react-router-dom";
 
 interface User {
   firstname: string;
@@ -27,7 +26,6 @@ const Settings = () => {
   const showToast = useToastStore(state => state.showToast)
   const [ verifyModal, setVerifyModal ] = useState(false)
   const resendCode = useAuthStore(state => state.resendCode)
-  const { pathname } = useLocation()
 
   // random avatar from dicebear
   const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${user?.firstname}${user?.lastname}`;
@@ -36,10 +34,6 @@ const Settings = () => {
     setEditingField(field);
     setTempValue(user?.[field] || '')
   };
-
-  useEffect(() => {
-    console.log(pathname != '/settings')
-  }, [])
 
   const handleSave = async () => {
     if (!editingField) return;
@@ -84,7 +78,6 @@ const Settings = () => {
     }
 
     try {
-      console.log("Updating password to:", newPassword);
       await updateUserInfo("password", newPassword);
       setEditingField(null);
       showToast("Password Changed", "success")

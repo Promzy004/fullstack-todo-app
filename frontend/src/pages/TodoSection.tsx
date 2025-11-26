@@ -39,10 +39,6 @@ const TodoSection = () => {
         fetchTasks()
     }, [])
 
-    useEffect(() => {
-        console.log(tasks)
-    }, [tasks])
-
 
     // handles update tasks, either completed or not completed
     const handleUpdateTask = async (e: React.ChangeEvent<HTMLInputElement>, id: number, completed: boolean, title: string) => {
@@ -89,13 +85,14 @@ const TodoSection = () => {
                 </p>
             </div>
 
-            {/* Input + Add Task */}
-            <div className="flex w-full max-w-xl space-x-2 mb-6">
-                <input
-                    type="text"
+            {/* Search + Add Task */}
+            <div className="flex w-full justify-between items-center max-w-xl space-x-2 mb-6">
+                {/* <input
+                    type="text"https://fullstack-todo-app-production-f8a3.up.railway.app
                     placeholder="What needs to be done?"
                     className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800  text-gray-900 dark:text-gray-100  placeholder-gray-400 dark:placeholder-gray-500focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                /> */}
+                <h2 className="text-3xl">Todos</h2>
                 <button 
                     className="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700"
                     onClick={openModal}

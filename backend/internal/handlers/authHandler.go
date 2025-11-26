@@ -126,7 +126,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
         Expires:  time.Now().Add(24 * time.Hour),
         HttpOnly: true,  // prevent JS access (XSS protection)
         Path:     "/",
-        SameSite: http.SameSiteStrictMode, // blocks cross-site use
+        SameSite: http.SameSiteNoneMode,
+		Secure:   true,
     })
 
 	w.WriteHeader(http.StatusOK)
@@ -147,7 +148,8 @@ func Logout (w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(-time.Hour),
 		HttpOnly: true,
 		Path: "/",
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
 	})
 
 	w.WriteHeader(http.StatusOK)

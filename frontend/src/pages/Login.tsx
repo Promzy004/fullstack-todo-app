@@ -53,6 +53,7 @@ const Login = () => {
             if (!resData.success) {
                 setFormErrors(resData?.errors?.errors)
             }
+            console.log(resData)
         }
     }
 
