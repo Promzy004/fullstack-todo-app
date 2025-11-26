@@ -41,7 +41,7 @@ const MobileSidebar = () => {
     
     return (
         <aside 
-            className="w-full h-full fixed left-0 bg-black/30"
+            className="w-full h-full fixed top-16 left-0 block md:hidden bg-black/30"
             onClick={() => setShowSidebar(false)}
         >
             <div 
@@ -58,6 +58,7 @@ const MobileSidebar = () => {
                                 <Link
                                     key={index}
                                     to={tab.path}
+                                    onClick={() => setShowSidebar(false)}
                                     className={`flex items-center space-x-2 px-3 py-2 rounded-md  ${pathname === tab.path ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                                 >
                                     <span>{tab.icon}</span>
