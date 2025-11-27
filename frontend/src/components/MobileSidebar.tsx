@@ -41,7 +41,7 @@ const MobileSidebar = () => {
     
     return (
         <aside 
-            className="w-full h-full fixed top-16 left-0 block md:hidden bg-black/30"
+            className="w-full h-[calc(100%-64px)] fixed top-16 left-0 block md:hidden bg-black/30"
             onClick={() => setShowSidebar(false)}
         >
             <div 
