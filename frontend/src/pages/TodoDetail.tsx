@@ -112,8 +112,7 @@ const TodoDetail = () => {
             Description
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
-            Create a clean, modern dashboard layout using React, Tailwind CSS, and Zustand.
-            Include widgets for quick stats, recent activity, and tasks overview.
+            {task.description}
           </p>
         </section>
 
