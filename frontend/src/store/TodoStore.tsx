@@ -66,7 +66,6 @@ export const useTodoStore = create<TodoStoreType>((set) => ({
             const res = await api.get("/api/tasks")
             return res.data
         } catch (err) {
-            console.log(err)
             return []
         }
     },
@@ -76,16 +75,14 @@ export const useTodoStore = create<TodoStoreType>((set) => ({
     },
 
     deleteTask: async (id) => {
-        await api.delete(`api/delete/${id}`)
+        return await api.delete(`/api/delete/${id}`)
     },
 
     getATask: async (id) => {
         try {
             const res = await api.get(`/api/task/${id}`)
-            console.log(id)
             return res.data
         } catch (err) {
-            console.log(err)
             return []
         }
     } 

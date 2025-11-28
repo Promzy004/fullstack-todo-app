@@ -108,7 +108,6 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         set({ loading: true })
         try{
             const res = await api.get("/api/user");
-            console.log(res)
             set({ user: res.data.user, loading: false, authChecked: true });
         } catch (error) {
             set({ user: null, loading: false, authChecked: true });
