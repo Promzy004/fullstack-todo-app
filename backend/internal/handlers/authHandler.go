@@ -127,7 +127,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
         HttpOnly: true,  // prevent JS access (XSS protection)
         Path:     "/",
         SameSite: http.SameSiteNoneMode,
-		Secure: false,
+		Secure: true,
     })
 
 	w.WriteHeader(http.StatusOK)
@@ -149,7 +149,7 @@ func Logout (w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Path: "/",
 		SameSite: http.SameSiteNoneMode,
-		Secure: false,
+		Secure: true,
 	})
 
 	w.WriteHeader(http.StatusOK)

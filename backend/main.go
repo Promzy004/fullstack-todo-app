@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"todo-app/internal/routes"
 
 	"todo-app/config"
@@ -20,16 +21,30 @@ func main() {
 	if os.Getenv("RAILWAY_ENVIRONMENT") == "" {
 		config.LoadEnv()
 	}
-	
+
 	port := os.Getenv("PORT")
 	r := chi.NewRouter()
 	r.Use(middlewares.CORSMiddleware)
 	routes.APIRoutes(r)
 
+	// Serve frontend static files + React Router fallback
+	r.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+		distDir := "./dist"
+		path := filepath.Join(distDir, r.URL.Path)
+
+		// Serve index.html for React routes if file doesn't exist
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			http.ServeFile(w, r, filepath.Join(distDir, "index.html"))
+			return
+		}
+
+		// Otherwise serve the static file
+		http.FileServer(http.Dir(distDir)).ServeHTTP(w, r)
+	})
+
 	//database connection
 	config.ConnectDatabase()
 	defer config.DB.Close()
-
 
 	fmt.Println("Server is running ...")
 	fmt.Printf("Running server on [http://127.0.0.1:%s]\n", port)

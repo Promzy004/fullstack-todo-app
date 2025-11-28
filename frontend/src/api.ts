@@ -1,12 +1,12 @@
 // api.ts
 import axios from "axios";
 
-// Base URL of your server
-const API_URL = "https://fullstack-todo-app-production-f8a3.up.railway.app"; 
+// // Base URL of your server
+// const API_URL = ""; 
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_URL,
+  // baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
